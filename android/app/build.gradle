@@ -1,0 +1,71 @@
+import java.util.Properties
+import java.io.File
+
+plugins {
+    id "com.android.application"
+    id "kotlin-android"
+    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
+    id "dev.flutter.flutter-gradle-plugin"
+}
+
+android {
+    namespace = "yuki.naruse.ramen_recommendation"
+    compileSdk = 35
+    ndkVersion = flutter.ndkVersion
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_17
+    }
+
+    defaultConfig {
+        minSdk = 30
+        targetSdk = 35
+        versionCode = flutter.versionCode
+        versionName = flutter.versionName
+    }
+
+    flavorDimensions "default"
+
+    productFlavors {
+        dev {
+            dimension "default"
+            applicationIdSuffix ".dev"
+            def devEnvProps = loadProperties(new File(rootDir, '.env.dev')) // Fileオブジェクトを直接作成
+            manifestPlaceholders = [googleMapsApiKey: devEnvProps.getProperty('GOOGLE_MAPS_API_KEY', "")]
+        }
+        prod {
+            dimension "default"
+            applicationId "yuki.naruse.ramen_recommendation"
+            def prodEnvProps = loadProperties(new File(rootDir, '.env.prod')) // Fileオブジェクトを直接作成
+            manifestPlaceholders = [googleMapsApiKey: prodEnvProps.getProperty('GOOGLE_MAPS_API_KEY', "")]
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            shrinkResources false
+            signingConfig = signingConfigs.debug
+        }
+        debug {
+            minifyEnabled false
+        }
+    }
+}
+
+flutter {
+    source = "../.."
+}
+
+static def loadProperties(File file) { // 引数の型をFileに変更
+    def properties = new Properties()
+    if (file.exists()) {
+        file.withInputStream { properties.load(it) }
+    }
+    return properties
+}

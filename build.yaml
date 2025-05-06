@@ -1,0 +1,6 @@
+targets:
+  $default:
+    builders:
+      riverpod_generator:
+        options:
+          auto_register: null
