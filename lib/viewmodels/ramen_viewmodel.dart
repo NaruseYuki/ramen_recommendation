@@ -1,5 +1,7 @@
 // lib/viewmodels/ramen_viewmodel.dart
 import 'dart:io';
+import 'package:ramen_recommendation/models/requests/get_place_details_request.dart';
+import 'package:ramen_recommendation/models/requests/search_ramen_places_request.dart';
 import 'package:ramen_recommendation/repositories/interfaces/places_repository_interface.dart';
 import 'package:ramen_recommendation/services/image_picker_service.dart';
 import 'package:ramen_recommendation/services/tflite_service.dart';
@@ -95,9 +97,8 @@ class RamenViewModel extends _$RamenViewModel {
       }
 
       final places = await _placesRepository.searchRamenPlaces(
-        type: state.result ?? '',
-        position: position,
-      );
+          request: SearchRamenPlacesRequest(
+              position: position, keyword: state.result ?? ''));
       state = state.copyWith(places: places, isLoading: false);
       return true;
     } catch (e) {
@@ -176,7 +177,8 @@ class RamenViewModel extends _$RamenViewModel {
   Future<Map<String, dynamic>?> fetchPlaceDetails(String placeId) async {
     try {
       state = state.copyWith(isLoading: true);
-      final details = await _placesRepository.getPlaceDetails(placeId: placeId);
+      final details = await _placesRepository.getPlaceDetails(
+          request: GetPlaceDetailsRequest(placeId: placeId));
       state = state.copyWith(isLoading: false);
       return details;
     } catch (e) {
