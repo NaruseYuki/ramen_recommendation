@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ramen_recommendation/api/responses/search_ramen_places_response.dart';
 import 'package:ramen_recommendation/views/screens/home_screen.dart';
 import 'package:ramen_recommendation/views/screens/place_detail_screen.dart';
 
@@ -24,12 +25,12 @@ class SearchResultsScreen extends ConsumerWidget {
               : ListView.builder(
                   itemCount: state.places.length,
                   itemBuilder: (context, index) {
-                    final place = state.places[index];
+                    final place = state.places[index] as RamenPlace;
                     return ListTile(
-                        title: Text(place['displayName']['text'] ?? '名称不明'),
-                        subtitle: Text(place['formattedAddress'] ?? '住所不明'),
+                        title: Text(place.name),
+                        subtitle: Text(place.address),
                         onTap: () async {
-                          final placeId = place['id'];
+                          final placeId = place.id;
                           final navigation = Navigator.of(context);
                           final scaffold = ScaffoldMessenger.of(context);
                           // 非同期処理を実行

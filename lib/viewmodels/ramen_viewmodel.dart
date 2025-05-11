@@ -1,7 +1,6 @@
 // lib/viewmodels/ramen_viewmodel.dart
 import 'dart:io';
-import 'package:ramen_recommendation/models/requests/get_place_details_request.dart';
-import 'package:ramen_recommendation/models/requests/search_ramen_places_request.dart';
+import 'package:ramen_recommendation/api/responses/get_place_details_response.dart';
 import 'package:ramen_recommendation/repositories/interfaces/places_repository_interface.dart';
 import 'package:ramen_recommendation/services/image_picker_service.dart';
 import 'package:ramen_recommendation/services/tflite_service.dart';
@@ -9,6 +8,8 @@ import 'package:ramen_recommendation/services/database_service.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:ramen_recommendation/models/ramen_state.dart';
+import '../api/requests/get_place_details_request.dart';
+import '../api/requests/search_ramen_places_request.dart';
 import '../errors/app_error_code.dart';
 
 part 'ramen_viewmodel.g.dart';
@@ -96,10 +97,10 @@ class RamenViewModel extends _$RamenViewModel {
         return false;
       }
 
-      final places = await _placesRepository.searchRamenPlaces(
+      final response = await _placesRepository.searchRamenPlaces(
           request: SearchRamenPlacesRequest(
               position: position, keyword: state.result ?? ''));
-      state = state.copyWith(places: places, isLoading: false);
+      state = state.copyWith(places: response.places, isLoading: false);
       return true;
     } catch (e) {
       state = state.copyWith(
@@ -174,7 +175,7 @@ class RamenViewModel extends _$RamenViewModel {
   }
 
   /// Place Details API を呼び出す
-  Future<Map<String, dynamic>?> fetchPlaceDetails(String placeId) async {
+  Future<GetPlaceDetailsResponse?> fetchPlaceDetails(String placeId) async {
     try {
       state = state.copyWith(isLoading: true);
       final details = await _placesRepository.getPlaceDetails(

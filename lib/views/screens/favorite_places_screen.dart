@@ -29,8 +29,8 @@ class FavoritePlacesScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildBody(BuildContext context,
-      List<Map<String, dynamic>> favoritePlaces, RamenViewModel viewModel) {
+  Widget _buildBody(
+      BuildContext context, List favoritePlaces, RamenViewModel viewModel) {
     if (favoritePlaces.isEmpty) {
       return const Center(
         child: Text('お気に入りのラーメン店はありません'),
@@ -64,11 +64,13 @@ class FavoritePlacesScreen extends ConsumerWidget {
 
   void _navigateToPlaceDetail(
       BuildContext context, Map<String, dynamic> place) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => PlaceDetailScreen(details: place), // 詳細画面へ遷移
-      ),
-    );
+
+    // Navigator.push(
+    //   context,
+    //   MaterialPageRoute(
+    //     builder: (context) => PlaceDetailScreen(details: place), // 詳細画面へ遷移
+    //   ),
+    //
+
   }
 }

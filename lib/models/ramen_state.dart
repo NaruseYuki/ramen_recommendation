@@ -2,12 +2,12 @@
 import 'dart:io';
 import '../errors/app_error_code.dart';
 
-class RamenState {
+class RamenState<T> {
   File? imageFile;
   String? result;
   bool isLoading;
   AppErrorCode? error;
-  List<Map<String, dynamic>> places;
+  List<T> places; // ジェネリクス対応
   Set<String> favoritePlaceIds;
 
   RamenState({
@@ -19,15 +19,15 @@ class RamenState {
     this.favoritePlaceIds = const {},
   });
 
-  RamenState copyWith({
+  RamenState<T> copyWith({
     File? imageFile,
     String? result,
     bool? isLoading,
     AppErrorCode? error,
-    List<Map<String, dynamic>>? places,
+    List<T>? places,
     Set<String>? favoritePlaceIds,
   }) {
-    return RamenState(
+    return RamenState<T>(
       imageFile: imageFile ?? this.imageFile,
       result: result ?? this.result,
       isLoading: isLoading ?? this.isLoading,
