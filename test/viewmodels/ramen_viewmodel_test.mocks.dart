@@ -6,6 +6,7 @@
 import 'dart:async' as _i4;
 
 import 'package:mockito/mockito.dart' as _i1;
+import 'package:ramen_recommendation/models/ramen_place.dart' as _i5;
 import 'package:ramen_recommendation/services/database_service.dart' as _i3;
 import 'package:sqflite/sqflite.dart' as _i2;
 
@@ -47,49 +48,30 @@ class MockDatabaseService extends _i1.Mock implements _i3.DatabaseService {
           as _i4.Future<_i2.Database>);
 
   @override
-  _i4.Future<List<Map<String, dynamic>>> getRamenShopsByType(String? type) =>
+  _i4.Future<void> addFavorite(_i5.RamenPlace? place) =>
       (super.noSuchMethod(
-            Invocation.method(#getRamenShopsByType, [type]),
-            returnValue: _i4.Future<List<Map<String, dynamic>>>.value(
-              <Map<String, dynamic>>[],
+            Invocation.method(#addFavorite, [place]),
+            returnValue: _i4.Future<void>.value(),
+            returnValueForMissingStub: _i4.Future<void>.value(),
+          )
+          as _i4.Future<void>);
+
+  @override
+  _i4.Future<void> removeFavorite(String? id) =>
+      (super.noSuchMethod(
+            Invocation.method(#removeFavorite, [id]),
+            returnValue: _i4.Future<void>.value(),
+            returnValueForMissingStub: _i4.Future<void>.value(),
+          )
+          as _i4.Future<void>);
+
+  @override
+  _i4.Future<List<_i5.RamenPlace>> getFavorites() =>
+      (super.noSuchMethod(
+            Invocation.method(#getFavorites, []),
+            returnValue: _i4.Future<List<_i5.RamenPlace>>.value(
+              <_i5.RamenPlace>[],
             ),
           )
-          as _i4.Future<List<Map<String, dynamic>>>);
-
-  @override
-  _i4.Future<void> addFavoriteShop(Map<String, dynamic>? place) =>
-      (super.noSuchMethod(
-            Invocation.method(#addFavoriteShop, [place]),
-            returnValue: _i4.Future<void>.value(),
-            returnValueForMissingStub: _i4.Future<void>.value(),
-          )
-          as _i4.Future<void>);
-
-  @override
-  _i4.Future<void> removeFavoriteShop(String? placeId) =>
-      (super.noSuchMethod(
-            Invocation.method(#removeFavoriteShop, [placeId]),
-            returnValue: _i4.Future<void>.value(),
-            returnValueForMissingStub: _i4.Future<void>.value(),
-          )
-          as _i4.Future<void>);
-
-  @override
-  _i4.Future<List<Map<String, dynamic>>> getFavoriteShops() =>
-      (super.noSuchMethod(
-            Invocation.method(#getFavoriteShops, []),
-            returnValue: _i4.Future<List<Map<String, dynamic>>>.value(
-              <Map<String, dynamic>>[],
-            ),
-          )
-          as _i4.Future<List<Map<String, dynamic>>>);
-
-  @override
-  _i4.Future<void> closeDb() =>
-      (super.noSuchMethod(
-            Invocation.method(#closeDb, []),
-            returnValue: _i4.Future<void>.value(),
-            returnValueForMissingStub: _i4.Future<void>.value(),
-          )
-          as _i4.Future<void>);
+          as _i4.Future<List<_i5.RamenPlace>>);
 }

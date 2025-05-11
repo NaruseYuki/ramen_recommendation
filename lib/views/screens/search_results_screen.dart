@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:ramen_recommendation/api/responses/search_ramen_places_response.dart';
+import 'package:ramen_recommendation/models/ramen_place.dart';
 import 'package:ramen_recommendation/views/screens/home_screen.dart';
 import 'package:ramen_recommendation/views/screens/place_detail_screen.dart';
 
@@ -36,8 +36,7 @@ class SearchResultsScreen extends ConsumerWidget {
                           // 非同期処理を実行
                           final placeDetails =
                               await viewModel.fetchPlaceDetails(placeId);
-
-                          // 非同期処理後に mounted をチェックして遷移
+                          // 詳細情報を取得したら画面遷移
                           if (placeDetails != null) {
                             final route = MaterialPageRoute(
                               builder: (context) =>

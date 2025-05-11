@@ -3,16 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ramen_recommendation/api/google_places_api_client.dart';
 import 'package:ramen_recommendation/repositories/implements/places_repository.dart';
+import 'package:ramen_recommendation/services/database_service.dart';
+import 'package:ramen_recommendation/viewmodels/image_classification_viewmodel.dart';
 import 'package:ramen_recommendation/viewmodels/ramen_viewmodel.dart';
 import 'package:ramen_recommendation/views/screens/favorite_places_screen.dart';
 import 'package:ramen_recommendation/views/screens/search_results_screen.dart';
 
 import '../../models/ramen_state.dart';
 
-final ramenViewModelProvider = RamenViewModelFamily();
-final provider = ramenViewModelProvider(PlacesRepository(
-  GooglePlacesApiClient(),
-));
+final ramenViewModelProvider = RamenViewModel(ImageClassificationViewModel());
+final provider = ramenViewModelProvider(
+    PlacesRepository(GooglePlacesApiClient()), DatabaseService());
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});

@@ -1,18 +1,61 @@
 // lib/views/screens/place_detail_screen.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ramen_recommendation/api/responses/get_place_details_response.dart';
+import 'package:ramen_recommendation/models/ramen_place.dart';
+import 'package:ramen_recommendation/models/review.dart';
+import 'package:ramen_recommendation/views/screens/home_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class PlaceDetailScreen extends StatelessWidget {
+class PlaceDetailScreen extends ConsumerStatefulWidget {
   final GetPlaceDetailsResponse details;
 
   const PlaceDetailScreen({super.key, required this.details});
 
   @override
+  ConsumerState<PlaceDetailScreen> createState() => _PlaceDetailScreenState();
+}
+
+class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
+  late bool isFavorite;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(provider.notifier).loadModel();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final state = ref.watch(provider);
+    final viewModel = ref.read(provider.notifier);
+    isFavorite = state.favoritePlaceIds.contains(widget.details.id);
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(details.name),
+        title: Text(widget.details.name),
+        actions: [
+          IconButton(
+            icon: Icon(
+              isFavorite ? Icons.star : Icons.star_border,
+              color: isFavorite ? Colors.amber : Colors.white,
+            ),
+            onPressed: () {
+              viewModel.toggleFavorite(RamenPlace(
+                id: widget.details.id,
+                name: widget.details.name,
+                address: widget.details.address,
+                latitude: widget.details.latitude,
+                longitude: widget.details.longitude,
+              ));
+              setState(() {
+                isFavorite = !isFavorite;
+              });
+            },
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -29,29 +72,29 @@ class PlaceDetailScreen extends StatelessWidget {
   List<Widget> _buildPlaceDetails(BuildContext context) {
     List<Widget> list = [
       Text(
-        details.name,
+        widget.details.name,
         style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
       ),
       const SizedBox(height: 8),
       Text(
-        details.address,
+        widget.details.address,
         style: const TextStyle(fontSize: 16),
       ),
       const SizedBox(height: 16),
     ];
 
-    if (details.rating != null) {
+    if (widget.details.rating != null) {
       list.add(_buildRating());
     }
-    if (details.weekdayDescriptions.isNotEmpty) {
+    if (widget.details.weekdayDescriptions.isNotEmpty) {
       list.add(_buildOpeningHoursSection());
     }
 
-    if (details.reviews.isNotEmpty) {
+    if (widget.details.reviews.isNotEmpty) {
       list.add(_buildReviewsSection());
     }
 
-    if (details.website != null) {
+    if (widget.details.website != null) {
       list.add(_buildWebsiteButton(context));
     }
 
@@ -62,7 +105,7 @@ class PlaceDetailScreen extends StatelessWidget {
           width: double.infinity,
           child: ElevatedButton(
             onPressed: () {
-              _launchMap(details.latitude, details.longitude);
+              _launchMap(widget.details.latitude, widget.details.longitude);
             },
             child: const Text('地図アプリで開く'),
           ),
@@ -80,7 +123,7 @@ class PlaceDetailScreen extends StatelessWidget {
           children: [
             const Icon(Icons.star, color: Colors.amber),
             Text(
-              '${details.rating} (${details.userRatingsTotal ?? 0}件の評価)',
+              '${widget.details.rating} (${widget.details.userRatingsTotal ?? 0}件の評価)',
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
           ],
@@ -98,7 +141,9 @@ class PlaceDetailScreen extends StatelessWidget {
           '営業時間',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        ...details.weekdayDescriptions.map((text) => Text(text)).toList(),
+        ...widget.details.weekdayDescriptions
+            .map((text) => Text(text))
+            .toList(),
         const SizedBox(height: 16),
       ],
     );
@@ -113,7 +158,7 @@ class PlaceDetailScreen extends StatelessWidget {
           child: SizedBox(
             width: double.infinity,
             child: ElevatedButton(
-              onPressed: () => _launchWebsite(details.website!),
+              onPressed: () => _launchWebsite(widget.details.website!),
               child: const Text('ウェブサイト'),
             ),
           ),
@@ -131,7 +176,9 @@ class PlaceDetailScreen extends StatelessWidget {
           '口コミ',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        ...details.reviews.map((review) => _buildReviewTile(review)).toList(),
+        ...widget.details.reviews
+            .map((review) => _buildReviewTile(review))
+            .toList(),
         const SizedBox(height: 16),
       ],
     );

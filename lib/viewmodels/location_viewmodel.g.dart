@@ -1,12 +1,12 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'ramen_viewmodel.dart';
+part of 'location_viewmodel.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$ramenViewModelHash() => r'e1048e70d2f7257eaf333b6a1da6c5446934741b';
+String _$locationViewModelHash() => r'd763d1b4d250f13660ae7d22c8137c511c469636';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -29,7 +29,7 @@ class _SystemHash {
   }
 }
 
-abstract class _$RamenViewModel
+abstract class _$LocationViewModel
     extends BuildlessAutoDisposeNotifier<RamenState> {
   late final PlacesRepositoryInterface placesRepository;
 
@@ -38,27 +38,27 @@ abstract class _$RamenViewModel
   );
 }
 
-/// See also [RamenViewModel].
-@ProviderFor(RamenViewModel)
-const ramenViewModelProvider = RamenViewModelFamily();
+/// See also [LocationViewModel].
+@ProviderFor(LocationViewModel)
+const locationViewModelProvider = LocationViewModelFamily();
 
-/// See also [RamenViewModel].
-class RamenViewModelFamily extends Family<RamenState> {
-  /// See also [RamenViewModel].
-  const RamenViewModelFamily();
+/// See also [LocationViewModel].
+class LocationViewModelFamily extends Family<RamenState> {
+  /// See also [LocationViewModel].
+  const LocationViewModelFamily();
 
-  /// See also [RamenViewModel].
-  RamenViewModelProvider call(
+  /// See also [LocationViewModel].
+  LocationViewModelProvider call(
     PlacesRepositoryInterface placesRepository,
   ) {
-    return RamenViewModelProvider(
+    return LocationViewModelProvider(
       placesRepository,
     );
   }
 
   @override
-  RamenViewModelProvider getProviderOverride(
-    covariant RamenViewModelProvider provider,
+  LocationViewModelProvider getProviderOverride(
+    covariant LocationViewModelProvider provider,
   ) {
     return call(
       provider.placesRepository,
@@ -77,30 +77,30 @@ class RamenViewModelFamily extends Family<RamenState> {
       _allTransitiveDependencies;
 
   @override
-  String? get name => r'ramenViewModelProvider';
+  String? get name => r'locationViewModelProvider';
 }
 
-/// See also [RamenViewModel].
-class RamenViewModelProvider
-    extends AutoDisposeNotifierProviderImpl<RamenViewModel, RamenState> {
-  /// See also [RamenViewModel].
-  RamenViewModelProvider(
+/// See also [LocationViewModel].
+class LocationViewModelProvider
+    extends AutoDisposeNotifierProviderImpl<LocationViewModel, RamenState> {
+  /// See also [LocationViewModel].
+  LocationViewModelProvider(
     PlacesRepositoryInterface placesRepository,
   ) : this._internal(
-          () => RamenViewModel()..placesRepository = placesRepository,
-          from: ramenViewModelProvider,
-          name: r'ramenViewModelProvider',
+          () => LocationViewModel()..placesRepository = placesRepository,
+          from: locationViewModelProvider,
+          name: r'locationViewModelProvider',
           debugGetCreateSourceHash:
               const bool.fromEnvironment('dart.vm.product')
                   ? null
-                  : _$ramenViewModelHash,
-          dependencies: RamenViewModelFamily._dependencies,
+                  : _$locationViewModelHash,
+          dependencies: LocationViewModelFamily._dependencies,
           allTransitiveDependencies:
-              RamenViewModelFamily._allTransitiveDependencies,
+              LocationViewModelFamily._allTransitiveDependencies,
           placesRepository: placesRepository,
         );
 
-  RamenViewModelProvider._internal(
+  LocationViewModelProvider._internal(
     super._createNotifier, {
     required super.name,
     required super.dependencies,
@@ -114,7 +114,7 @@ class RamenViewModelProvider
 
   @override
   RamenState runNotifierBuild(
-    covariant RamenViewModel notifier,
+    covariant LocationViewModel notifier,
   ) {
     return notifier.build(
       placesRepository,
@@ -122,10 +122,10 @@ class RamenViewModelProvider
   }
 
   @override
-  Override overrideWith(RamenViewModel Function() create) {
+  Override overrideWith(LocationViewModel Function() create) {
     return ProviderOverride(
       origin: this,
-      override: RamenViewModelProvider._internal(
+      override: LocationViewModelProvider._internal(
         () => create()..placesRepository = placesRepository,
         from: from,
         name: null,
@@ -138,14 +138,14 @@ class RamenViewModelProvider
   }
 
   @override
-  AutoDisposeNotifierProviderElement<RamenViewModel, RamenState>
+  AutoDisposeNotifierProviderElement<LocationViewModel, RamenState>
       createElement() {
-    return _RamenViewModelProviderElement(this);
+    return _LocationViewModelProviderElement(this);
   }
 
   @override
   bool operator ==(Object other) {
-    return other is RamenViewModelProvider &&
+    return other is LocationViewModelProvider &&
         other.placesRepository == placesRepository;
   }
 
@@ -160,19 +160,19 @@ class RamenViewModelProvider
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-mixin RamenViewModelRef on AutoDisposeNotifierProviderRef<RamenState> {
+mixin LocationViewModelRef on AutoDisposeNotifierProviderRef<RamenState> {
   /// The parameter `placesRepository` of this provider.
   PlacesRepositoryInterface get placesRepository;
 }
 
-class _RamenViewModelProviderElement
-    extends AutoDisposeNotifierProviderElement<RamenViewModel, RamenState>
-    with RamenViewModelRef {
-  _RamenViewModelProviderElement(super.provider);
+class _LocationViewModelProviderElement
+    extends AutoDisposeNotifierProviderElement<LocationViewModel, RamenState>
+    with LocationViewModelRef {
+  _LocationViewModelProviderElement(super.provider);
 
   @override
   PlacesRepositoryInterface get placesRepository =>
-      (origin as RamenViewModelProvider).placesRepository;
+      (origin as LocationViewModelProvider).placesRepository;
 }
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

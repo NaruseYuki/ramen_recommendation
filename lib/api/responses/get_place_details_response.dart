@@ -1,3 +1,5 @@
+import 'package:ramen_recommendation/models/review.dart';
+
 class GetPlaceDetailsResponse {
   final String id;
   final String name;
@@ -28,9 +30,6 @@ class GetPlaceDetailsResponse {
   /// JSON から `GetPlaceDetailsResponse` を生成
   factory GetPlaceDetailsResponse.fromJson(Map<String, dynamic> json) {
     final location = json['location'] ?? {};
-    final reviewsJson = json['reviews'] as List<dynamic>? ?? [];
-    final reviews =
-        reviewsJson.map((review) => Review.fromJson(review)).toList();
 
     return GetPlaceDetailsResponse(
       id: json['id'] ?? '',
@@ -41,37 +40,12 @@ class GetPlaceDetailsResponse {
       rating: json['rating']?.toDouble(),
       userRatingsTotal: json['userRatingCount'],
       website: json['websiteUri'],
-      reviews: reviews,
+      reviews: (json['reviews'] as List<dynamic>? ?? [])
+          .map((review) => Review.fromJson(review))
+          .toList(),
       weekdayDescriptions: List<String>.from(
           json['currentOpeningHours']['weekdayDescriptions'] ?? []),
       openNow: json['currentOpeningHours']['openNow'] ?? false,
-    );
-  }
-}
-
-class Review {
-  final String authorName;
-  final String text;
-  final double? rating;
-  final String? authorPhotoUri;
-  final String? authorUri;
-
-  Review({
-    required this.authorName,
-    required this.text,
-    this.rating,
-    this.authorPhotoUri,
-    this.authorUri,
-  });
-
-  /// JSON から `Review` を生成
-  factory Review.fromJson(Map<String, dynamic> json) {
-    return Review(
-      authorName: json['authorAttribution']['displayName'] ?? '名無し',
-      text: json['originalText']['text'] ?? '口コミなし',
-      rating: json['rating']?.toDouble(),
-      authorPhotoUri: json['authorAttribution']['photoUri'],
-      authorUri: json['authorAttribution']['uri'],
     );
   }
 }

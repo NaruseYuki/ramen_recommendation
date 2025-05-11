@@ -1,121 +1,67 @@
-// lib/services/database_service.dart
+import 'package:ramen_recommendation/models/ramen_place.dart';
 import 'package:sqflite/sqflite.dart';
-
 import 'package:path/path.dart';
 
-import '../errors/app_error_code.dart';
-
 class DatabaseService {
-  static Database? _database;
+  static final DatabaseService _instance = DatabaseService._internal();
+  Database? _database;
 
-  /// データベースを初期化し、接続を確立する
+  DatabaseService._internal();
+
+  factory DatabaseService() => _instance;
+
   Future<Database> get database async {
-    if (_database != null) {
-      return _database!;
-    }
-    _database = await _initializeDb();
+    if (_database != null) return _database!;
+    _database = await _initDatabase();
     return _database!;
   }
 
-  /// データベースを初期化する
-  Future<Database> _initializeDb() async {
+  Future<Database> _initDatabase() async {
     final dbPath = await getDatabasesPath();
-    final path = join(dbPath, 'ramen.db'); // データベースファイル名
-    final db = await openDatabase(
+    final path = join(dbPath, 'favorites.db');
+
+    return openDatabase(
       path,
       version: 1,
-      onCreate: _onCreate,
+      onCreate: (db, version) {
+        return db.execute('''
+          CREATE TABLE favorites (
+            id TEXT PRIMARY KEY,
+            name TEXT,
+            address TEXT,
+            latitude REAL,
+            longitude REAL
+          )
+        ''');
+      },
     );
-    return db;
   }
 
-  /// データベース作成時の処理
-  Future<void> _onCreate(Database db, int version) async {
-    await db.execute('''
-      CREATE TABLE IF NOT EXISTS ramen_shops (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT,
-        type TEXT,
-        latitude REAL,
-        longitude REAL,
-        rating REAL,
-        imageUrl TEXT
-      )
-    ''');
-    await db.execute('''
-      CREATE TABLE IF NOT EXISTS favorite_shops (
-        place_id TEXT PRIMARY KEY,
-        name TEXT,
-        vicinity TEXT,
-        latitude REAL,
-        longitude REAL
-      )
-    ''');
-  }
-
-  /// ラーメン店情報を取得する (未使用になったため、必要に応じて修正または削除)
-  Future<List<Map<String, dynamic>>> getRamenShopsByType(String type) async {
+  Future<void> addFavorite(RamenPlace place) async {
     final db = await database;
-    try {
-      final results = await db.query(
-        'ramen_shops',
-        where: 'type = ?',
-        whereArgs: [type],
+    await db.insert('favorites', place as Map<String, Object?>,
+        conflictAlgorithm: ConflictAlgorithm.replace);
+  }
+
+  Future<void> removeFavorite(String id) async {
+    final db = await database;
+    await db.delete('favorites', where: 'id = ?', whereArgs: [id]);
+  }
+
+  /// お気に入りを取得し、`RamenPlace` のリストを返却
+  Future<List<RamenPlace>> getFavorites() async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query('favorites');
+
+    // Map を RamenPlace に変換してリストとして返却
+    return List.generate(maps.length, (i) {
+      return RamenPlace(
+        id: maps[i]['id'] as String,
+        name: maps[i]['name'] as String,
+        address: maps[i]['address'] as String,
+        latitude: maps[i]['latitude'] as double,
+        longitude: maps[i]['longitude'] as double,
       );
-      return results;
-    } catch (e) {
-      throw AppErrorCode.databaseUnknownError();
-    }
-  }
-
-  /// お気に入りに追加
-  Future<void> addFavoriteShop(Map<String, dynamic> place) async {
-    final db = await database;
-    try {
-      await db.insert(
-        'favorite_shops',
-        {
-          'place_id': place['place_id'],
-          'name': place['name'],
-          'vicinity': place['vicinity'],
-          'latitude': place['geometry']['location']['lat'],
-          'longitude': place['geometry']['location']['lng'],
-        },
-        conflictAlgorithm: ConflictAlgorithm.replace,
-      );
-    } catch (e) {
-      throw AppErrorCode.databaseUnknownError();
-    }
-  }
-
-  /// お気に入りから削除
-  Future<void> removeFavoriteShop(String placeId) async {
-    final db = await database;
-    try {
-      await db.delete(
-        'favorite_shops',
-        where: 'place_id = ?',
-        whereArgs: [placeId],
-      );
-    } catch (e) {
-      throw AppErrorCode.databaseUnknownError();
-    }
-  }
-
-  /// お気に入りを取得
-  Future<List<Map<String, dynamic>>> getFavoriteShops() async {
-    final db = await database;
-    try {
-      final results = await db.query('favorite_shops');
-      return results;
-    } catch (e) {
-      throw AppErrorCode.databaseUnknownError();
-    }
-  }
-
-  /// データベースを閉じる
-  Future<void> closeDb() async {
-    final db = await database;
-    db.close();
+    });
   }
 }
