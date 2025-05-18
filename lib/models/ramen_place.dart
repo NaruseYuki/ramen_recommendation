@@ -5,13 +5,12 @@ class RamenPlace {
   final double latitude;
   final double longitude;
 
-  RamenPlace({
-    required this.id,
-    required this.name,
-    required this.address,
-    required this.latitude,
-    required this.longitude,
-  });
+  RamenPlace(
+      {required this.id,
+      required this.name,
+      required this.address,
+      required this.latitude,
+      required this.longitude});
 
   /// JSON から `RamenPlace` を生成
   factory RamenPlace.fromJson(Map<String, dynamic> json) {

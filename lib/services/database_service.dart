@@ -37,15 +37,26 @@ class DatabaseService {
     );
   }
 
-  Future<void> addFavorite(RamenPlace place) async {
-    final db = await database;
-    await db.insert('favorites', place as Map<String, Object?>,
-        conflictAlgorithm: ConflictAlgorithm.replace);
+  Future<bool> addFavorite(RamenPlace place) async {
+    try {
+      final db = await database;
+      await db.insert('favorites', place.toJson(),
+          conflictAlgorithm: ConflictAlgorithm.replace);
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 
-  Future<void> removeFavorite(String id) async {
-    final db = await database;
-    await db.delete('favorites', where: 'id = ?', whereArgs: [id]);
+  Future<bool> removeFavorite(String id) async {
+    try {
+      final db = await database;
+      final count =
+          await db.delete('favorites', where: 'id = ?', whereArgs: [id]);
+      return count > 0;
+    } catch (e) {
+      return false;
+    }
   }
 
   /// お気に入りを取得し、`RamenPlace` のリストを返却

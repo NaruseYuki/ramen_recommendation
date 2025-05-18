@@ -4,10 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ramen_recommendation/api/responses/get_place_details_response.dart';
 import 'package:ramen_recommendation/app_initializer.dart';
 import 'package:ramen_recommendation/models/ramen_place.dart';
-import 'package:ramen_recommendation/models/ramen_state.dart';
 import 'package:ramen_recommendation/models/review.dart';
-import 'package:ramen_recommendation/viewmodels/favorite_places_viewmodel.dart';
-import 'package:ramen_recommendation/viewmodels/location_viewmodel.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class PlaceDetailScreen extends ConsumerStatefulWidget {
@@ -25,29 +22,17 @@ class PlaceDetailScreen extends ConsumerStatefulWidget {
 }
 
 class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
-  late bool isFavorite;
-  late final FavoritePlacesViewModel favoritePlacesViewModel;
-  late final RamenState favoriteState;
-  late final RamenState locationState;
-  late final LocationViewModel locationViewModel;
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
-    // お気に入りのラーメン店をロード
-    favoritePlacesViewModel = ref
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+    final favoritePlacesViewModel = ref
         .read(widget.appInitializer.favoritePlacesViewModelProvider.notifier);
-    locationViewModel =
-        ref.read(widget.appInitializer.locationViewModelProvider.notifier);
-    locationState = ref.watch(widget.appInitializer.locationViewModelProvider);
-    favoriteState =
+    final favoriteState =
         ref.watch(widget.appInitializer.favoritePlacesViewModelProvider);
-    isFavorite =
+
+    final isFavorite =
         favoriteState.places.any((place) => place.id == widget.details.id);
+
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.details.name),
@@ -57,17 +42,24 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
               isFavorite ? Icons.star : Icons.star_border,
               color: isFavorite ? Colors.amber : Colors.white,
             ),
-            onPressed: () {
-              favoritePlacesViewModel.toggleFavorite(RamenPlace(
+            onPressed: () async {
+              final result =
+                  await favoritePlacesViewModel.toggleFavorite(RamenPlace(
                 id: widget.details.id,
                 name: widget.details.name,
                 address: widget.details.address,
                 latitude: widget.details.latitude,
                 longitude: widget.details.longitude,
               ));
-              setState(() {
-                isFavorite = !isFavorite;
-              });
+              scaffoldMessenger.showSnackBar(
+                SnackBar(
+                  content: Text(
+                    result
+                        ? (isFavorite ? 'お気に入りから削除しました' : 'お気に入りに追加しました')
+                        : 'お気に入りの更新に失敗しました',
+                  ),
+                ),
+              );
             },
           ),
         ],

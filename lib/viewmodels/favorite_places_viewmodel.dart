@@ -16,19 +16,36 @@ class FavoritePlacesViewModel extends _$FavoritePlacesViewModel {
     return RamenState();
   }
 
-  void toggleFavorite(RamenPlace place) {
+  Future<bool> toggleFavorite(RamenPlace place) async {
+    state = state.copyWith(isLoading: true);
     final placeId = place.id;
+    bool result = false;
     if (state.favoritePlaceIds.contains(placeId)) {
-      _databaseService.removeFavorite(placeId);
-      state = state.copyWith(
-        favoritePlaceIds: Set.from(state.favoritePlaceIds)..remove(placeId),
-      );
+      result = await _databaseService.removeFavorite(placeId);
+      if (result) {
+        state = state.copyWith(
+          isLoading: false,
+          favoritePlaceIds: Set.from(state.favoritePlaceIds)..remove(placeId),
+          places: state.places
+              .where((place) => place.id != placeId)
+              .toList()
+        );
+      } else {
+        state = state.copyWith(isLoading: false);
+      }
     } else {
-      _databaseService.addFavorite(place);
-      state = state.copyWith(
-        favoritePlaceIds: Set.from(state.favoritePlaceIds)..add(placeId),
-      );
+      result = await _databaseService.addFavorite(place);
+      if (result) {
+        state = state.copyWith(
+          favoritePlaceIds: Set.from(state.favoritePlaceIds)..add(placeId),
+          places: List.from(state.places)..add(place),
+          isLoading: false,
+        );
+      } else {
+        state = state.copyWith(isLoading: false);
+      }
     }
+    return result;
   }
 
   Future<bool> loadFavoriteShops() async {
@@ -37,6 +54,7 @@ class FavoritePlacesViewModel extends _$FavoritePlacesViewModel {
       final shops = await _databaseService.getFavorites();
       state = state.copyWith(
           favoritePlaceIds: Set.from(shops.map((shop) => shop.id)),
+          places: shops,
           isLoading: false);
       return true;
     } catch (e) {
