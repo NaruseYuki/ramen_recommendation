@@ -2,15 +2,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ramen_recommendation/api/responses/get_place_details_response.dart';
+import 'package:ramen_recommendation/app_initializer.dart';
 import 'package:ramen_recommendation/models/ramen_place.dart';
+import 'package:ramen_recommendation/models/ramen_state.dart';
 import 'package:ramen_recommendation/models/review.dart';
-import 'package:ramen_recommendation/views/screens/home_screen.dart';
+import 'package:ramen_recommendation/viewmodels/favorite_places_viewmodel.dart';
+import 'package:ramen_recommendation/viewmodels/location_viewmodel.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class PlaceDetailScreen extends ConsumerStatefulWidget {
   final GetPlaceDetailsResponse details;
+  final AppInitializer appInitializer;
 
-  const PlaceDetailScreen({super.key, required this.details});
+  const PlaceDetailScreen({
+    super.key,
+    required this.details,
+    required this.appInitializer,
+  });
 
   @override
   ConsumerState<PlaceDetailScreen> createState() => _PlaceDetailScreenState();
@@ -18,21 +26,28 @@ class PlaceDetailScreen extends ConsumerStatefulWidget {
 
 class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
   late bool isFavorite;
+  late final FavoritePlacesViewModel favoritePlacesViewModel;
+  late final RamenState favoriteState;
+  late final RamenState locationState;
+  late final LocationViewModel locationViewModel;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(provider.notifier).loadModel();
-    });
   }
 
   @override
   Widget build(BuildContext context) {
-    final state = ref.watch(provider);
-    final viewModel = ref.read(provider.notifier);
-    isFavorite = state.favoritePlaceIds.contains(widget.details.id);
-
+    // お気に入りのラーメン店をロード
+    favoritePlacesViewModel = ref
+        .read(widget.appInitializer.favoritePlacesViewModelProvider.notifier);
+    locationViewModel =
+        ref.read(widget.appInitializer.locationViewModelProvider.notifier);
+    locationState = ref.watch(widget.appInitializer.locationViewModelProvider);
+    favoriteState =
+        ref.watch(widget.appInitializer.favoritePlacesViewModelProvider);
+    isFavorite =
+        favoriteState.places.any((place) => place.id == widget.details.id);
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.details.name),
@@ -43,7 +58,7 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
               color: isFavorite ? Colors.amber : Colors.white,
             ),
             onPressed: () {
-              viewModel.toggleFavorite(RamenPlace(
+              favoritePlacesViewModel.toggleFavorite(RamenPlace(
                 id: widget.details.id,
                 name: widget.details.name,
                 address: widget.details.address,

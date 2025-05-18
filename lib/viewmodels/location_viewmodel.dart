@@ -75,13 +75,18 @@ class LocationViewModel extends _$LocationViewModel {
 
   /// Place Details API を呼び出す
   Future<GetPlaceDetailsResponse?> fetchPlaceDetails(String placeId) async {
+    state = state.copyWith(isLoading: true);
     try {
       final response = await _placesRepository.getPlaceDetails(
         request: GetPlaceDetailsRequest(placeId: placeId),
       );
+      state = state.copyWith(isLoading: false);
       return response;
     } catch (e) {
       // 必要に応じてエラーハンドリングを追加
+      state = state.copyWith(
+          error: AppErrorCode.mapUnknownError(), isLoading: false);
+
       return null;
     }
   }

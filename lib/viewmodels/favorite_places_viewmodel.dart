@@ -31,14 +31,18 @@ class FavoritePlacesViewModel extends _$FavoritePlacesViewModel {
     }
   }
 
-  Future<void> loadFavoriteShops() async {
+  Future<bool> loadFavoriteShops() async {
     try {
+      state = state.copyWith(isLoading: true);
       final shops = await _databaseService.getFavorites();
       state = state.copyWith(
-        favoritePlaceIds: Set.from(shops.map((shop) => shop.id)),
-      );
+          favoritePlaceIds: Set.from(shops.map((shop) => shop.id)),
+          isLoading: false);
+      return true;
     } catch (e) {
-      throw AppErrorCode.databaseUnknownError();
+      state = state.copyWith(
+          error: AppErrorCode.databaseUnknownError(), isLoading: false);
+      return false;
     }
   }
 }
