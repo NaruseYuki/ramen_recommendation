@@ -70,7 +70,7 @@ class SearchResultsScreen extends ConsumerWidget {
                           context, locationViewModel, place.id),
                     );
                   },
-                ),
+                )
     );
   }
 }
