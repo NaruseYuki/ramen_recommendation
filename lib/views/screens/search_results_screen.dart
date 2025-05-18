@@ -53,7 +53,7 @@ class SearchResultsScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('付近の${ramenType.split(' ')[1]}の検索結果'),
+        title: Text('周辺の$ramenTypeの検索結果'),
       ),
       body: locationState.isLoading
           ? const Center(child: CircularProgressIndicator())

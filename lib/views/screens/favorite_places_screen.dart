@@ -31,20 +31,10 @@ class _FavoritePlacesScreenState extends ConsumerState<FavoritePlacesScreen> {
     locationViewModel =
         ref.read(widget.appInitializer.locationViewModelProvider.notifier);
 
-    // お気に入りのラーメン店をロード
-    _loadFavoriteShops();
-  }
-
-  /// お気に入りのラーメン店をロード
-  void _loadFavoriteShops() {
-    final scaffoldMessenger = ScaffoldMessenger.of(context);
-
-    favoritePlacesViewModel.loadFavoriteShops().then((value) {
-      if (value == false) {
-        scaffoldMessenger.showSnackBar(
-          const SnackBar(content: Text('お気に入りのラーメン店の取得に失敗しました')),
-        );
-      }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref
+          .read(widget.appInitializer.favoritePlacesViewModelProvider.notifier)
+          .loadFavoriteShops();
     });
   }
 
@@ -94,7 +84,7 @@ class _FavoritePlacesScreenState extends ConsumerState<FavoritePlacesScreen> {
         subtitle: Text(ramenPlace.address),
         trailing: IconButton(
           icon: const Icon(Icons.delete),
-          onPressed: () => favoritePlacesViewModel.toggleFavorite(ramenPlace),
+          onPressed:  () async => await  favoritePlacesViewModel.toggleFavorite(ramenPlace),
         ),
         onTap: () => _fetchAndNavigateToPlaceDetail(context, ramenPlace),
       ),
