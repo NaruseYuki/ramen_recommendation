@@ -1,4 +1,6 @@
 // lib/views/screens/home_screen.dart
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ramen_recommendation/app_initializer.dart';
@@ -26,20 +28,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   void initState() {
     super.initState();
-
-    // 一度だけ初期化する処理を initState に移動
     imageClassificationViewModel = ref.read(
         widget.appInitializer.imageClassificationViewModelProvider.notifier);
     locationViewModel =
         ref.read(widget.appInitializer.locationViewModelProvider.notifier);
-
-    // モデルのロード
     imageClassificationViewModel.loadModel();
   }
 
   @override
   Widget build(BuildContext context) {
-    // 状態を監視
+    // ここでローカル変数として取得
     final imageState =
         ref.watch(widget.appInitializer.imageClassificationViewModelProvider);
     final locationState =
@@ -64,27 +62,35 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ],
       ),
       body: Center(
-        child: SingleChildScrollView(
+        child: locationState.isLoading
+            ? const CircularProgressIndicator()
+            : SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(16.0),
-            child: _buildContent(
-                context, imageState, imageClassificationViewModel),
+            child: _buildContent(context, imageState),
           ),
         ),
       ),
-      bottomNavigationBar:
-          _buildBottomBar(context, imageState, locationViewModel),
+      bottomNavigationBar: locationState.isLoading
+          ? const SizedBox.shrink()
+          :_buildBottomBar(context, imageState, locationState),
     );
   }
 
-  Widget _buildContent(BuildContext context, RamenState state,
-      ImageClassificationViewModel imageClassificationViewModel) {
+  Widget _buildContent(BuildContext context, RamenState imageState) {
     List<Widget> children = [];
 
-    if (state.imageFile != null) {
-      children.add(Image.file(state.imageFile!));
+    if (imageState.imageFile == null) {
+      children.add(const Text('画像を選択してください'));
+    } else if (imageState.imageFile != null) {
+      children.add(
+        Image.file(
+          imageState.imageFile!,
+          width: 300,
+          height: 300,
+        ),
+      );
     }
-
     children.addAll([
       ElevatedButton(
         onPressed: () => imageClassificationViewModel.pickImageFromGallery(),
@@ -96,16 +102,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       ),
     ]);
 
-    if (state.isLoading) {
+    if (imageState.isLoading) {
       children.add(const CircularProgressIndicator());
-    } else if (state.result != null) {
-      children.add(Text('分析結果: ${state.result}'));
+    } else if (imageState.result != null) {
+      children.add(Text('分析結果: ${imageState.result}'));
     }
 
-    if (state.error != null) {
+    if (imageState.error != null) {
       children.add(
         Text(
-          'エラー: ${state.error}',
+          'エラー: ${imageState.error}',
           style: const TextStyle(color: Colors.red),
         ),
       );
@@ -117,10 +123,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  Widget _buildBottomBar(BuildContext context, RamenState state,
-      LocationViewModel locationViewModel) {
+  Widget _buildBottomBar(
+      BuildContext context, RamenState imageState, RamenState locationState) {
     final isSearchDisabled =
-        state.result == null || state.result?.split(' ')[0] == '4';
+        imageState.result == null || imageState.result?.split(' ')[0] == '4';
 
     return Padding(
       padding: const EdgeInsets.all(8.0),
@@ -130,24 +136,25 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             : () async {
                 final scaffold = ScaffoldMessenger.of(context);
                 final navigation = Navigator.of(context);
+                final keyword = imageState.result?.split(' ')[1] ?? '';
                 final success = await locationViewModel
-                    .searchRamenPlaces(state.result?.split(' ')[1] ?? '');
+                    .searchRamenPlaces(keyword);
                 if (success) {
                   final route = MaterialPageRoute(
                     builder: (context) => SearchResultsScreen(
-                        ramenType: state.result ?? '',
+                        ramenType: keyword,
                         appInitializer: widget.appInitializer),
                   );
                   navigation.push(route);
-                } else if (!success) {
+                } else {
                   scaffold.showSnackBar(
                     const SnackBar(content: Text('検索に失敗しました')),
                   );
                 }
               },
         child: Text(
-          isSearchDisabled ? '検索できません' : '付近のラーメンを検索',
-        ),
+                isSearchDisabled ? '検索できません' : '付近のラーメンを検索',
+              ),
       ),
     );
   }
