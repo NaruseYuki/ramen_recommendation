@@ -37,6 +37,7 @@ dependencies:
   flutter_riverpod: ^2.6.1
   sqflite: ^2.2.8 # sqfliteを追加
   path_provider: ^2.0.13 # sqfliteのパス取得に必要
+  path: ^1.9.0 # 最新バージョンを指定
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

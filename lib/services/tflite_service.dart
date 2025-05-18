@@ -11,6 +11,13 @@ import '../errors/app_error_code.dart';
 class TFLiteService {
   Interpreter? _interpreter;
   List<String>? _labels;
+  static final TFLiteService _instance = TFLiteService._internal();
+
+  factory TFLiteService() {
+    return _instance;
+  }
+
+  TFLiteService._internal();
 
   /// モデルとラベルをロード
   Future<void> loadModel() async {
@@ -56,7 +63,7 @@ class TFLiteService {
 
       final reshapedInput = inputBuffer.reshape(inputShape);
 
-      //推論の実行
+      // 推論の実行
       final outputShape = _interpreter!.getOutputTensor(0).shape;
       final outputBuffer =
           Float32List(outputShape.reduce((a, b) => a * b)).reshape(outputShape);

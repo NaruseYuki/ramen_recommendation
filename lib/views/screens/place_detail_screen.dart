@@ -1,18 +1,76 @@
 // lib/views/screens/place_detail_screen.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ramen_recommendation/api/responses/get_place_details_response.dart';
+import 'package:ramen_recommendation/app_initializer.dart';
+import 'package:ramen_recommendation/models/ramen_place.dart';
+import 'package:ramen_recommendation/models/ramen_state.dart';
+import 'package:ramen_recommendation/models/review.dart';
+import 'package:ramen_recommendation/viewmodels/favorite_places_viewmodel.dart';
+import 'package:ramen_recommendation/viewmodels/location_viewmodel.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:intl/intl.dart';
 
-class PlaceDetailScreen extends StatelessWidget {
-  final Map<String, dynamic> details;
+class PlaceDetailScreen extends ConsumerStatefulWidget {
+  final GetPlaceDetailsResponse details;
+  final AppInitializer appInitializer;
 
-  const PlaceDetailScreen({super.key, required this.details});
+  const PlaceDetailScreen({
+    super.key,
+    required this.details,
+    required this.appInitializer,
+  });
+
+  @override
+  ConsumerState<PlaceDetailScreen> createState() => _PlaceDetailScreenState();
+}
+
+class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
+  late bool isFavorite;
+  late final FavoritePlacesViewModel favoritePlacesViewModel;
+  late final RamenState favoriteState;
+  late final RamenState locationState;
+  late final LocationViewModel locationViewModel;
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
+    // お気に入りのラーメン店をロード
+    favoritePlacesViewModel = ref
+        .read(widget.appInitializer.favoritePlacesViewModelProvider.notifier);
+    locationViewModel =
+        ref.read(widget.appInitializer.locationViewModelProvider.notifier);
+    locationState = ref.watch(widget.appInitializer.locationViewModelProvider);
+    favoriteState =
+        ref.watch(widget.appInitializer.favoritePlacesViewModelProvider);
+    isFavorite =
+        favoriteState.places.any((place) => place.id == widget.details.id);
     return Scaffold(
       appBar: AppBar(
-        title: Text(details['displayName']['text'] ?? '名称不明'),
+        title: Text(widget.details.name),
+        actions: [
+          IconButton(
+            icon: Icon(
+              isFavorite ? Icons.star : Icons.star_border,
+              color: isFavorite ? Colors.amber : Colors.white,
+            ),
+            onPressed: () {
+              favoritePlacesViewModel.toggleFavorite(RamenPlace(
+                id: widget.details.id,
+                name: widget.details.name,
+                address: widget.details.address,
+                latitude: widget.details.latitude,
+                longitude: widget.details.longitude,
+              ));
+              setState(() {
+                isFavorite = !isFavorite;
+              });
+            },
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -29,43 +87,40 @@ class PlaceDetailScreen extends StatelessWidget {
   List<Widget> _buildPlaceDetails(BuildContext context) {
     List<Widget> list = [
       Text(
-        details['displayName']['text'] ?? '名称不明',
+        widget.details.name,
         style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
       ),
       const SizedBox(height: 8),
       Text(
-        details['formattedAddress'] ?? '住所不明',
+        widget.details.address,
         style: const TextStyle(fontSize: 16),
       ),
       const SizedBox(height: 16),
     ];
 
-    if (details['rating'] != null) {
+    if (widget.details.rating != null) {
       list.add(_buildRating());
     }
-    if (details['currentOpeningHours']!= null) {
+    if (widget.details.weekdayDescriptions.isNotEmpty) {
       list.add(_buildOpeningHoursSection());
     }
 
-    if (details['reviews'].isNotEmpty) {
+    if (widget.details.reviews.isNotEmpty) {
       list.add(_buildReviewsSection());
     }
 
-    if (details['websiteUri'] != null) {
+    if (widget.details.website != null) {
       list.add(_buildWebsiteButton(context));
     }
 
     list.add(
       Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0), // 両端に隙間を追加
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
         child: SizedBox(
-          width: double.infinity, // ボタンを横幅いっぱいに広げる
+          width: double.infinity,
           child: ElevatedButton(
             onPressed: () {
-              final location = details['location'];
-              if (location != null) {
-                _launchMap(location['latitude'], location['longitude']);
-              }
+              _launchMap(widget.details.latitude, widget.details.longitude);
             },
             child: const Text('地図アプリで開く'),
           ),
@@ -83,7 +138,7 @@ class PlaceDetailScreen extends StatelessWidget {
           children: [
             const Icon(Icons.star, color: Colors.amber),
             Text(
-              '${details['rating']} (${details['userRatingCount'] ?? '0'}件の評価)',
+              '${widget.details.rating} (${widget.details.userRatingsTotal ?? 0}件の評価)',
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
           ],
@@ -94,11 +149,6 @@ class PlaceDetailScreen extends StatelessWidget {
   }
 
   Widget _buildOpeningHoursSection() {
-    final openingHours = details['currentOpeningHours'];
-    if (openingHours == null) {
-      return const SizedBox.shrink();
-    }
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -106,30 +156,24 @@ class PlaceDetailScreen extends StatelessWidget {
           '営業時間',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        if (openingHours['weekdayDescriptions'] != null)
-          ...openingHours['weekdayDescriptions']
-              .map<Widget>((text) => Text(text))
-              .toList(),
+        ...widget.details.weekdayDescriptions
+            .map((text) => Text(text))
+            .toList(),
         const SizedBox(height: 16),
       ],
     );
   }
 
   Widget _buildWebsiteButton(BuildContext context) {
-    final websiteUri = details['websiteUri'];
-    if (websiteUri == null) {
-      return const SizedBox.shrink();
-    }
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0), // 両端に隙間を追加
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: SizedBox(
-            width: double.infinity, // ボタンを横幅いっぱいに広げる
+            width: double.infinity,
             child: ElevatedButton(
-              onPressed: () => _launchWebsite(websiteUri),
+              onPressed: () => _launchWebsite(widget.details.website!),
               child: const Text('ウェブサイト'),
             ),
           ),
@@ -140,11 +184,6 @@ class PlaceDetailScreen extends StatelessWidget {
   }
 
   Widget _buildReviewsSection() {
-    final reviews = details['reviews'];
-    if (reviews == null || reviews.isEmpty) {
-      return const SizedBox.shrink();
-    }
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -152,47 +191,47 @@ class PlaceDetailScreen extends StatelessWidget {
           '口コミ',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        ..._buildReviews(reviews),
+        ...widget.details.reviews
+            .map((review) => _buildReviewTile(review))
+            .toList(),
         const SizedBox(height: 16),
       ],
     );
   }
 
-  List<Widget> _buildReviews(List<dynamic> reviews) {
-    return reviews.map<Widget>((review) {
-      return Container(
-        margin: const EdgeInsets.symmetric(vertical: 8.0),
-        padding: const EdgeInsets.all(8.0),
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey.shade300),
-          borderRadius: BorderRadius.circular(8.0),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+  Widget _buildReviewTile(Review review) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 8.0),
+      padding: const EdgeInsets.all(8.0),
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey.shade300),
+        borderRadius: BorderRadius.circular(8.0),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.person),
+              const SizedBox(width: 8),
+              Text(
+                review.authorName,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Text(review.text),
+          if (review.rating != null)
             Row(
               children: [
-                const Icon(Icons.person),
-                const SizedBox(width: 8),
-                Text(
-                  review['authorAttribution']['displayName'] ?? '名無し',
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
+                const Icon(Icons.star, color: Colors.amber),
+                Text('${review.rating}'),
               ],
             ),
-            const SizedBox(height: 4),
-            Text(review['originalText']['text'] ?? '口コミなし'),
-            if (review['rating'] != null)
-              Row(
-                children: [
-                  const Icon(Icons.star, color: Colors.amber),
-                  Text('${review['rating']}'),
-                ],
-              ),
-          ],
-        ),
-      );
-    }).toList();
+        ],
+      ),
+    );
   }
 
   Future<void> _launchMap(double latitude, double longitude) async {
@@ -207,7 +246,7 @@ class PlaceDetailScreen extends StatelessWidget {
 
   Future<void> _launchWebsite(String websiteUri) async {
     final url = Uri.parse(websiteUri);
-      if (await canLaunchUrl(url)) {
+    if (await canLaunchUrl(url)) {
       await launchUrl(url);
     } else {
       throw 'ウェブサイトを開けません';
