@@ -6,7 +6,7 @@ part of 'location_viewmodel.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$locationViewModelHash() => r'36da830b70f3fea5199d1e3fcb6ffe0a40d20ac4';
+String _$locationViewModelHash() => r'd763d1b4d250f13660ae7d22c8137c511c469636';
 
 /// Copied from Dart SDK
 class _SystemHash {

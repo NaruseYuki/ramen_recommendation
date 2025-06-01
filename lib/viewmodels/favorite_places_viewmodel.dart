@@ -1,5 +1,5 @@
 import 'package:ramen_recommendation/models/ramen_place.dart';
-import 'package:ramen_recommendation/state/ramen_state.dart';
+import 'package:ramen_recommendation/models/ramen_state.dart';
 import 'package:ramen_recommendation/services/database_service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../errors/app_error_code.dart';

@@ -2,7 +2,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:ramen_recommendation/api/requests/get_place_details_request.dart';
 import 'package:ramen_recommendation/api/requests/search_ramen_places_request.dart';
 import 'package:ramen_recommendation/api/responses/get_place_details_response.dart';
-import 'package:ramen_recommendation/state/ramen_state.dart';
+import 'package:ramen_recommendation/models/ramen_state.dart';
 import 'package:ramen_recommendation/repositories/interfaces/places_repository_interface.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../errors/app_error_code.dart';

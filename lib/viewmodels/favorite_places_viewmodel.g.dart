@@ -7,7 +7,7 @@ part of 'favorite_places_viewmodel.dart';
 // **************************************************************************
 
 String _$favoritePlacesViewModelHash() =>
-    r'f6aa01a7a83b9354d5f5d2fe65ce67d2271d4caa';
+    r'08ee5d3546472a65d0a492b9bd7c118db138816c';
 
 /// Copied from Dart SDK
 class _SystemHash {

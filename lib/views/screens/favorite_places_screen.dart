@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ramen_recommendation/app_initializer.dart';
 import 'package:ramen_recommendation/models/ramen_place.dart';
-import 'package:ramen_recommendation/viewmodels/app_viewmodel.dart'; // AppViewModelをインポート
+import 'package:ramen_recommendation/viewmodels/favorite_places_viewmodel.dart';
+import 'package:ramen_recommendation/viewmodels/location_viewmodel.dart';
 import 'package:ramen_recommendation/views/screens/place_detail_screen.dart';
 
 class FavoritePlacesScreen extends ConsumerStatefulWidget {
@@ -17,27 +18,36 @@ class FavoritePlacesScreen extends ConsumerStatefulWidget {
 }
 
 class _FavoritePlacesScreenState extends ConsumerState<FavoritePlacesScreen> {
-  late final AppViewModel appViewModel; // AppViewModelを使用
+  late final FavoritePlacesViewModel favoritePlacesViewModel;
+  late final LocationViewModel locationViewModel;
 
   @override
   void initState() {
     super.initState();
 
-    appViewModel = ref.read(widget.appInitializer.appViewModelProvider.notifier); // AppViewModelを初期化
+    // 一度だけ初期化する処理を initState に移動
+    favoritePlacesViewModel = ref
+        .read(widget.appInitializer.favoritePlacesViewModelProvider.notifier);
+    locationViewModel =
+        ref.read(widget.appInitializer.locationViewModelProvider.notifier);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      appViewModel.loadFavoriteShops(); // AppViewModel経由でお気に入りをロード
+      ref
+          .read(widget.appInitializer.favoritePlacesViewModelProvider.notifier)
+          .loadFavoriteShops();
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    // 結合された状態を監視
-    final appState = ref.watch(widget.appInitializer.appViewModelProvider);
-    final favoriteState = appState.favoritePlacesState; // 個々の状態にアクセス
+    // 状態を監視
+    final favoriteState =
+        ref.watch(widget.appInitializer.favoritePlacesViewModelProvider);
+    final locationState =
+        ref.watch(widget.appInitializer.locationViewModelProvider);
 
     final List<RamenPlace> favoritePlaces =
-    favoriteState.places as List<RamenPlace>;
+        favoriteState.places as List<RamenPlace>;
 
     return Scaffold(
       appBar: _buildAppBar(),
@@ -74,7 +84,7 @@ class _FavoritePlacesScreenState extends ConsumerState<FavoritePlacesScreen> {
         subtitle: Text(ramenPlace.address),
         trailing: IconButton(
           icon: const Icon(Icons.delete),
-          onPressed:  () async => await  appViewModel.toggleFavorite(ramenPlace), // AppViewModel経由で呼び出し
+          onPressed:  () async => await  favoritePlacesViewModel.toggleFavorite(ramenPlace),
         ),
         onTap: () => _fetchAndNavigateToPlaceDetail(context, ramenPlace),
       ),
@@ -89,7 +99,7 @@ class _FavoritePlacesScreenState extends ConsumerState<FavoritePlacesScreen> {
 
     try {
       // 店の詳細情報を取得
-      final placeDetails = await appViewModel.fetchPlaceDetails(place.id); // AppViewModel経由で呼び出し
+      final placeDetails = await locationViewModel.fetchPlaceDetails(place.id);
 
       if (placeDetails != null) {
         // 詳細画面に遷移
