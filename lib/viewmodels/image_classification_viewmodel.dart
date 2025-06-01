@@ -4,6 +4,7 @@ import 'package:ramen_recommendation/services/image_picker_service.dart';
 import 'package:ramen_recommendation/models/ramen_state.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../errors/app_error_code.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 part 'image_classification_viewmodel.g.dart';
 
@@ -65,4 +66,20 @@ class ImageClassificationViewModel extends _$ImageClassificationViewModel {
       state = state.copyWith(error: e as AppErrorCode, isLoading: false);
     }
   }
+}
+
+Future<bool> requestCameraPermission() async {
+  final status = await Permission.camera.request();
+  return status.isGranted;
+}
+
+Future<bool> requestGalleryPermission() async {
+  // Android 13以降はREAD_MEDIA_IMAGES、それ未満はREAD_EXTERNAL_STORAGE
+  if (await Permission.photos.isGranted || await Permission.photos.request().isGranted) {
+    return true;
+  }
+  if (await Permission.storage.isGranted || await Permission.storage.request().isGranted) {
+    return true;
+  }
+  return false;
 }

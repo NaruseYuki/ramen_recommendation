@@ -1,10 +1,7 @@
 // lib/views/screens/home_screen.dart
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ramen_recommendation/app_initializer.dart';
-import 'package:ramen_recommendation/viewmodels/favorite_places_viewmodel.dart';
 import 'package:ramen_recommendation/viewmodels/image_classification_viewmodel.dart';
 import 'package:ramen_recommendation/viewmodels/location_viewmodel.dart';
 import 'package:ramen_recommendation/views/screens/favorite_places_screen.dart';
@@ -79,6 +76,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   Widget _buildContent(BuildContext context, RamenState imageState) {
     List<Widget> children = [];
+     final scaffoldManager = ScaffoldMessenger.of(context);
 
     if (imageState.imageFile == null) {
       children.add(const Text('画像を選択してください'));
@@ -93,11 +91,27 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     }
     children.addAll([
       ElevatedButton(
-        onPressed: () => imageClassificationViewModel.pickImageFromGallery(),
+        onPressed: () async {
+          if (await requestGalleryPermission()) {
+            await imageClassificationViewModel.pickImageFromGallery();
+          } else {
+            scaffoldManager.showSnackBar(
+              const SnackBar(content: Text('ギャラリーへのアクセスが許可されていません')),
+            );
+          }
+        },
         child: const Text('ギャラリーから選択'),
       ),
       ElevatedButton(
-        onPressed: () => imageClassificationViewModel.pickImageFromCamera(),
+        onPressed: () async {
+          if (await requestCameraPermission()) {
+            await imageClassificationViewModel.pickImageFromCamera();
+          } else {
+            scaffoldManager.showSnackBar(
+              const SnackBar(content: Text('カメラへのアクセスが許可されていません')),
+            );
+          }
+        },
         child: const Text('カメラで撮影'),
       ),
     ]);
