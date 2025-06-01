@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:ramen_recommendation/services/tflite_service.dart';
 import 'package:ramen_recommendation/services/image_picker_service.dart';
-import 'package:ramen_recommendation/models/ramen_state.dart';
+import 'package:ramen_recommendation/state/ramen_state.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../errors/app_error_code.dart';
 

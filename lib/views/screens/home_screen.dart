@@ -4,44 +4,35 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ramen_recommendation/app_initializer.dart';
-import 'package:ramen_recommendation/viewmodels/favorite_places_viewmodel.dart';
-import 'package:ramen_recommendation/viewmodels/image_classification_viewmodel.dart';
-import 'package:ramen_recommendation/viewmodels/location_viewmodel.dart';
+import 'package:ramen_recommendation/viewmodels/app_viewmodel.dart'; // AppViewModelをインポート
 import 'package:ramen_recommendation/views/screens/favorite_places_screen.dart';
 import 'package:ramen_recommendation/views/screens/search_results_screen.dart';
 
-import '../../models/ramen_state.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   final AppInitializer appInitializer;
   const HomeScreen({super.key, required this.appInitializer});
-  // AppInitializer を引数に取るコンストラクタを追加
 
   @override
   ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
-  late final ImageClassificationViewModel imageClassificationViewModel;
-  late final LocationViewModel locationViewModel;
+  late final AppViewModel appViewModel; // AppViewModelを使用
 
   @override
   void initState() {
     super.initState();
-    imageClassificationViewModel = ref.read(
-        widget.appInitializer.imageClassificationViewModelProvider.notifier);
-    locationViewModel =
-        ref.read(widget.appInitializer.locationViewModelProvider.notifier);
-    imageClassificationViewModel.loadModel();
+    appViewModel = ref.read(widget.appInitializer.appViewModelProvider.notifier); // AppViewModelを初期化
+    appViewModel.loadModel(); // AppViewModel経由でモデルをロード
   }
 
   @override
   Widget build(BuildContext context) {
-    // ここでローカル変数として取得
-    final imageState =
-        ref.watch(widget.appInitializer.imageClassificationViewModelProvider);
-    final locationState =
-        ref.watch(widget.appInitializer.locationViewModelProvider);
+    // AppViewModelから結合された状態を監視
+    final appState = ref.watch(widget.appInitializer.appViewModelProvider);
+    final imageState = appState.imageClassificationState; // 個々の状態にアクセス
+    final locationState = appState.locationState; // 個々の状態にアクセス
 
     return Scaffold(
       appBar: AppBar(
@@ -77,7 +68,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  Widget _buildContent(BuildContext context, RamenState imageState) {
+  Widget _buildContent(BuildContext context, imageState) { // imageState は RamenState<File>
     List<Widget> children = [];
 
     if (imageState.imageFile == null) {
@@ -93,11 +84,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     }
     children.addAll([
       ElevatedButton(
-        onPressed: () => imageClassificationViewModel.pickImageFromGallery(),
+        onPressed: () => appViewModel.pickImageFromGallery(), // AppViewModel経由で呼び出し
         child: const Text('ギャラリーから選択'),
       ),
       ElevatedButton(
-        onPressed: () => imageClassificationViewModel.pickImageFromCamera(),
+        onPressed: () => appViewModel.pickImageFromCamera(), // AppViewModel経由で呼び出し
         child: const Text('カメラで撮影'),
       ),
     ]);
@@ -124,7 +115,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Widget _buildBottomBar(
-      BuildContext context, RamenState imageState, RamenState locationState) {
+      BuildContext context, imageState, locationState) { // imageState と locationState は RamenState
     final isSearchDisabled =
         imageState.result == null || imageState.result?.split(' ')[0] == '4';
 
@@ -134,27 +125,27 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         onPressed: isSearchDisabled
             ? null
             : () async {
-                final scaffold = ScaffoldMessenger.of(context);
-                final navigation = Navigator.of(context);
-                final keyword = imageState.result?.split(' ')[1] ?? '';
-                final success = await locationViewModel
-                    .searchRamenPlaces(keyword);
-                if (success) {
-                  final route = MaterialPageRoute(
-                    builder: (context) => SearchResultsScreen(
-                        ramenType: keyword,
-                        appInitializer: widget.appInitializer),
-                  );
-                  navigation.push(route);
-                } else {
-                  scaffold.showSnackBar(
-                    const SnackBar(content: Text('検索に失敗しました')),
-                  );
-                }
-              },
+          final scaffold = ScaffoldMessenger.of(context);
+          final navigation = Navigator.of(context);
+          final keyword = imageState.result?.split(' ')[1] ?? '';
+          final success = await appViewModel
+              .searchRamenPlaces(keyword); // AppViewModel経由で呼び出し
+          if (success) {
+            final route = MaterialPageRoute(
+              builder: (context) => SearchResultsScreen(
+                  ramenType: keyword,
+                  appInitializer: widget.appInitializer),
+            );
+            navigation.push(route);
+          } else {
+            scaffold.showSnackBar(
+              const SnackBar(content: Text('検索に失敗しました')),
+            );
+          }
+        },
         child: Text(
-                isSearchDisabled ? '検索できません' : '付近のラーメンを検索',
-              ),
+          isSearchDisabled ? '検索できません' : '付近のラーメンを検索',
+        ),
       ),
     );
   }

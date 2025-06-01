@@ -25,13 +25,12 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final scaffoldMessenger = ScaffoldMessenger.of(context);
-    final favoritePlacesViewModel = ref
-        .read(widget.appInitializer.favoritePlacesViewModelProvider.notifier);
-    final favoriteState =
-        ref.watch(widget.appInitializer.favoritePlacesViewModelProvider);
+    final appViewModel = ref.read(widget.appInitializer.appViewModelProvider.notifier); // AppViewModelを取得
+    final appState = ref.watch(widget.appInitializer.appViewModelProvider);
+    final favoriteState = appState.favoritePlacesState; // 個々の状態にアクセス
 
     final isFavorite =
-        favoriteState.places.any((place) => place.id == widget.details.id);
+    favoriteState.places.any((place) => place.id == widget.details.id);
 
     return Scaffold(
       appBar: AppBar(
@@ -44,7 +43,7 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
             ),
             onPressed: () async {
               final result =
-                  await favoritePlacesViewModel.toggleFavorite(RamenPlace(
+              await appViewModel.toggleFavorite(RamenPlace( // AppViewModel経由で呼び出し
                 id: widget.details.id,
                 name: widget.details.name,
                 address: widget.details.address,
