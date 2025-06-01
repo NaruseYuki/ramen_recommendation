@@ -54,7 +54,7 @@ class GooglePlacesApiClient {
     final headers = {
       'Content-Type': 'application/json',
       'X-Goog-Api-Key': _apiKey,
-      'X-Goog-FieldMask': 'displayName,formattedAddress,currentOpeningHours,rating,userRatingCount,websiteUri,reviews,location' // 必要なフィールド
+     // 'X-Goog-FieldMask': 'id,displayName,formattedAddress,currentOpeningHours,rating,userRatingCount,websiteUri,reviews,location'
     };
 
     try {
