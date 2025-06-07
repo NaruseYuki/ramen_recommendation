@@ -1,26 +1,27 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'home_viewmodel.dart';
+part of 'place_detail_viewmodel.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$homeViewModelHash() => r'04c819dd3add660076c825b3830e26dee3aa7802';
+String _$placeDetailViewModelHash() =>
+    r'623094a2aad851380023509bfb00c407ee962f57';
 
-/// See also [HomeViewModel].
-@ProviderFor(HomeViewModel)
-final homeViewModelProvider =
-    AutoDisposeNotifierProvider<HomeViewModel, RamenState>.internal(
-  HomeViewModel.new,
-  name: r'homeViewModelProvider',
+/// See also [PlaceDetailViewModel].
+@ProviderFor(PlaceDetailViewModel)
+final placeDetailViewModelProvider =
+    AutoDisposeNotifierProvider<PlaceDetailViewModel, RamenState>.internal(
+  PlaceDetailViewModel.new,
+  name: r'placeDetailViewModelProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
       ? null
-      : _$homeViewModelHash,
+      : _$placeDetailViewModelHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef _$HomeViewModel = AutoDisposeNotifier<RamenState>;
+typedef _$PlaceDetailViewModel = AutoDisposeNotifier<RamenState>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

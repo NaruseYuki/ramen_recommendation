@@ -9,7 +9,9 @@ import '../../api/requests/search_ramen_places_request.dart';
 class PlacesRepository implements PlacesRepositoryInterface {
   final GooglePlacesApiClient apiClient;
 
-  PlacesRepository(this.apiClient);
+  PlacesRepository(
+    this.apiClient,
+  );
 
   /// ラーメン店を検索する
   @override

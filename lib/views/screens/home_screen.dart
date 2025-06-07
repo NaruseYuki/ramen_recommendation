@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ramen_recommendation/models/ramen_state.dart';
 import 'package:ramen_recommendation/viewmodels/home_viewmodel.dart';
 import 'package:ramen_recommendation/views/screens/favorite_places_screen.dart';
+import 'package:ramen_recommendation/views/screens/search_results_screen.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -109,16 +110,17 @@ class HomeScreen extends ConsumerWidget {
       BuildContext context, RamenState state, HomeViewModel viewModel) {
     final isSearchDisabled =
         state.result == null || state.result?.split(' ')[0] == '4';
+    final keyword = state.result?.split(' ')[1] ?? '';
 
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: ElevatedButton(
-        onPressed: isSearchDisabled
-            ? null
-            : () async {
-                // ここで検索処理を呼び出す
-                // 必要に応じてviewModel経由でメソッドを追加してください
-              },
+        onPressed: () {
+          final route = MaterialPageRoute(
+            builder: (context) => SearchResultsScreen(ramenType: keyword),
+          );
+          Navigator.push(context, route);
+        },
         child: Text(
           isSearchDisabled ? '検索できません' : '付近のラーメンを検索',
         ),

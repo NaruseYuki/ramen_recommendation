@@ -32,7 +32,7 @@ class HomeViewModel extends _$HomeViewModel {
     try {
       await _tfliteService.loadModel();
     } catch (e) {
-      state = state.copyWith(error: e as AppErrorCode);
+      state = state.copyWith(error: AppErrorCode.tensorFlowLiteUnknownError());
     }
   }
 
