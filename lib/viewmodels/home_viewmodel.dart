@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 import 'package:ramen_recommendation/api/providers/service_providers.dart';
 import 'package:ramen_recommendation/services/tflite_service.dart';
@@ -21,17 +22,12 @@ class HomeViewModel extends _$HomeViewModel {
     // 必要ならここで初期化処理
     return RamenState();
   }
-
-  init() {
-    // 初期化時にモデルをロード
-    loadModel();
-  }
-
   /// モデルのロード
   Future<void> loadModel() async {
     try {
       await _tfliteService.loadModel();
     } catch (e) {
+      log('Model loading failed: $e');
       state = state.copyWith(error: AppErrorCode.tensorFlowLiteUnknownError());
     }
   }

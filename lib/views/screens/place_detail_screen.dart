@@ -6,26 +6,28 @@ import 'package:ramen_recommendation/models/review.dart';
 import 'package:ramen_recommendation/viewmodels/place_detail_viewmodel.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class PlaceDetailScreen extends ConsumerWidget {
+class PlaceDetailScreen extends ConsumerStatefulWidget {
   final String placeId;
 
-  const PlaceDetailScreen({
-    super.key,
-    required this.placeId,
-  });
+  const PlaceDetailScreen({super.key, required this.placeId});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<PlaceDetailScreen> createState() => _PlaceDetailScreenState();
+}
+
+class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
+  @override
+  void initState() {
+    super.initState();
+      final state = ref.read(placeDetailViewModelProvider);
+        ref.read(placeDetailViewModelProvider.notifier).fetchPlaceDetails(widget.placeId);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final scaffoldMessenger = ScaffoldMessenger.of(context);
     final state = ref.watch(placeDetailViewModelProvider);
     final viewModel = ref.read(placeDetailViewModelProvider.notifier);
-
-    // 初回のみfetchPlaceDetailsを呼ぶ
-    Future.microtask(() {
-      if (!state.detail.containsKey(placeId) && !state.isLoading) {
-        viewModel.fetchPlaceDetails(placeId);
-      }
-    });
 
     if (state.isLoading) {
       return const Scaffold(
@@ -40,14 +42,14 @@ class PlaceDetailScreen extends ConsumerWidget {
       );
     }
 
-    if (!state.detail.containsKey(placeId)) {
+    if (!state.detail.containsKey(widget.placeId)) {
       return Scaffold(
         appBar: AppBar(),
         body: const Center(child: Text('店舗情報が取得できませんでした')),
       );
     }
 
-    final detail = state.detail[placeId]!;
+    final detail = state.detail[widget.placeId]!;
     final isFavorite = state.favoritePlaceIds.contains(detail.id);
 
     return Scaffold(

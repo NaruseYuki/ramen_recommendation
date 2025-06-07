@@ -18,7 +18,7 @@ ImagePickerService imagePickerService(ref) => ImagePickerService();
 DatabaseService databaseService(ref) => DatabaseService();
 
 @riverpod
-GooglePlacesApiClient googlePlacesApiClientProvider(ref) =>
+GooglePlacesApiClient googlePlacesApiClient(ref) =>
     GooglePlacesApiClient();
 
 @riverpod

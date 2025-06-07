@@ -1,4 +1,3 @@
-// lib/views/screens/home_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ramen_recommendation/models/ramen_state.dart';
@@ -6,13 +5,27 @@ import 'package:ramen_recommendation/viewmodels/home_viewmodel.dart';
 import 'package:ramen_recommendation/views/screens/favorite_places_screen.dart';
 import 'package:ramen_recommendation/views/screens/search_results_screen.dart';
 
-class HomeScreen extends ConsumerWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends ConsumerState<HomeScreen> {
+  late HomeViewModel homeViewModel;
+
+  @override
+  void initState() {
+    super.initState();
+    homeViewModel = ref.read(homeViewModelProvider.notifier);
+    // 必要があれば初期化処理をここで行う
+    homeViewModel.loadModel();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final homeState = ref.watch(homeViewModelProvider);
-    final homeViewModel = ref.read(homeViewModelProvider.notifier);
 
     return Scaffold(
       appBar: AppBar(
@@ -35,20 +48,19 @@ class HomeScreen extends ConsumerWidget {
         child: homeState.isLoading
             ? const CircularProgressIndicator()
             : SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: _buildContent(context, homeState, homeViewModel),
-                ),
-              ),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: _buildContent(context, homeState),
+          ),
+        ),
       ),
       bottomNavigationBar: homeState.isLoading
           ? const SizedBox.shrink()
-          : _buildBottomBar(context, homeState, homeViewModel),
+          : _buildBottomBar(context, homeState),
     );
   }
 
-  Widget _buildContent(
-      BuildContext context, RamenState state, HomeViewModel viewModel) {
+  Widget _buildContent(BuildContext context, RamenState state) {
     final scaffoldManager = ScaffoldMessenger.of(context);
     List<Widget> children = [];
 
@@ -63,10 +75,11 @@ class HomeScreen extends ConsumerWidget {
         ),
       );
     }
+
     children.addAll([
       ElevatedButton(
         onPressed: () async {
-          await viewModel.pickImageFromGalleryWithPermission();
+          await homeViewModel.pickImageFromGalleryWithPermission();
           if (state.error != null) {
             scaffoldManager.showSnackBar(
               SnackBar(content: Text(state.error.toString())),
@@ -77,7 +90,7 @@ class HomeScreen extends ConsumerWidget {
       ),
       ElevatedButton(
         onPressed: () async {
-          await viewModel.pickImageFromCameraWithPermission();
+          await homeViewModel.pickImageFromCameraWithPermission();
           if (state.error != null) {
             scaffoldManager.showSnackBar(
               SnackBar(content: Text(state.error.toString())),
@@ -91,6 +104,7 @@ class HomeScreen extends ConsumerWidget {
     if (state.result != null) {
       children.add(Text('分析結果: ${state.result}'));
     }
+
     if (state.error != null) {
       children.add(
         Text(
@@ -106,8 +120,7 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildBottomBar(
-      BuildContext context, RamenState state, HomeViewModel viewModel) {
+  Widget _buildBottomBar(BuildContext context, RamenState state) {
     final isSearchDisabled =
         state.result == null || state.result?.split(' ')[0] == '4';
     final keyword = state.result?.split(' ')[1] ?? '';
@@ -115,7 +128,9 @@ class HomeScreen extends ConsumerWidget {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: ElevatedButton(
-        onPressed: () {
+        onPressed: isSearchDisabled
+            ? null
+            : () {
           final route = MaterialPageRoute(
             builder: (context) => SearchResultsScreen(ramenType: keyword),
           );

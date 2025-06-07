@@ -83,13 +83,13 @@ class ErrorMessageManager {
     AppErrorCode.imageFileSizeExceeded().errorCode:
         '画像ファイルのサイズが上限を超えています。\nファイルサイズを5MB以下にしてください。',
     AppErrorCode.imageUnknownError().errorCode:
-        '画像処理中に不明なエラーが発生しました。\nしばらくしてから再度お試しください。問題が解決しない場合は、開発者にお問い合わせください。',
+        '画像処理中に不明なエラーが発生しました。\nしばらくしてから再度お試しください。',
     AppErrorCode.tensorFlowLiteLoadFailed().errorCode:
         'TensorFlow Liteモデルのロードに失敗しました。\nアプリを再起動してください。問題が解決しない場合は、アプリを再インストールしてください。',
     AppErrorCode.tensorFlowLiteInvalidInput().errorCode:
-        'TensorFlow Liteモデルへの入力が無効です。\nアプリを再起動してください。問題が解決しない場合は、開発者にお問い合わせください。',
+        'TensorFlow Liteモデルへの入力が無効です。\nアプリを再起動してください。',
     AppErrorCode.tensorFlowLiteUnknownError().errorCode:
-        'TensorFlow Liteモデルの実行中に不明なエラーが発生しました。\nしばらくしてから再度お試しください。問題が解決しない場合は、開発者にお問い合わせください。',
+        'TensorFlow Liteモデルの実行中に不明なエラーが発生しました。\nしばらくしてから再度お試しください。',
     AppErrorCode.databaseConnectionFailed().errorCode:
         'データベースへの接続に失敗しました。\nネットワーク接続を確認してください。',
     AppErrorCode.databaseInvalidQuery().errorCode:
@@ -97,7 +97,7 @@ class ErrorMessageManager {
     AppErrorCode.databaseNotFound().errorCode:
         '該当するデータが見つかりませんでした。\n条件を変更して再度検索してください。',
     AppErrorCode.databaseUnknownError().errorCode:
-        'データベース操作中に不明なエラーが発生しました。\nしばらくしてから再度お試しください。問題が解決しない場合は、開発者にお問い合わせください。',
+        'データベース操作中に不明なエラーが発生しました。\nしばらくしてから再度お試しください。',
     AppErrorCode.mapConnectionFailed().errorCode:
         'Google Maps APIへの接続に失敗しました。\nネットワーク接続を確認してください。',
     AppErrorCode.mapPermissionDenied().errorCode:
@@ -107,7 +107,7 @@ class ErrorMessageManager {
     AppErrorCode.galleryPermissionDenied().errorCode:
         'ギャラリーの使用が許可されていません。\nアプリの設定でギャラリーの利用を許可してください。',
     AppErrorCode.mapUnknownError().errorCode:
-        '地図表示中に不明なエラーが発生しました。\nしばらくしてから再度お試しください。問題が解決しない場合は、開発者にお問い合わせください。',
+        'お店の情報の取得に失敗しました。\nしばらくしてから再度お試しください。',
   };
 
   /// エラーコードに対応するメッセージを取得

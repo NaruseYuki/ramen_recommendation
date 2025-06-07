@@ -1,5 +1,4 @@
 import 'package:ramen_recommendation/api/requests/get_place_details_request.dart';
-import 'package:ramen_recommendation/api/responses/get_place_details_response.dart';
 import 'package:ramen_recommendation/models/ramen_place.dart';
 import 'package:ramen_recommendation/repositories/interfaces/places_repository_interface.dart';
 import 'package:ramen_recommendation/services/database_service.dart';
@@ -46,7 +45,7 @@ class PlaceDetailViewModel extends _$PlaceDetailViewModel {
     return result;
   }
 
-  Future<GetPlaceDetailsResponse?> fetchPlaceDetails(String placeId) async {
+  Future<void> fetchPlaceDetails(String placeId) async {
     state = state.copyWith(isLoading: true);
     try {
       final response = await _placesRepository.getPlaceDetails(
@@ -59,7 +58,6 @@ class PlaceDetailViewModel extends _$PlaceDetailViewModel {
     } catch (e) {
       state = state.copyWith(
           error: AppErrorCode.mapUnknownError(), isLoading: false);
-      return null;
     }
   }
 }
