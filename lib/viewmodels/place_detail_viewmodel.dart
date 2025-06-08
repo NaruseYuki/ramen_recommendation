@@ -45,6 +45,19 @@ class PlaceDetailViewModel extends _$PlaceDetailViewModel {
     return result;
   }
 
+  fetchInitialData(String placeId) async {
+    state = state.copyWith(isLoading: true);
+    try {
+      // 初期データのロード処理をここに追加
+      await loadFavoritePlacesWithoutLoading();
+      await fetchPlaceDetailsWithoutLoading(placeId);
+      state = state.copyWith(isLoading: false);
+    } catch (e) {
+      state = state.copyWith(
+          error: e as AppErrorCode, isLoading: false);
+    }
+  }
+
   Future<void> fetchPlaceDetails(String placeId) async {
     state = state.copyWith(isLoading: true);
     try {
@@ -58,6 +71,45 @@ class PlaceDetailViewModel extends _$PlaceDetailViewModel {
     } catch (e) {
       state = state.copyWith(
           error: e as AppErrorCode, isLoading: false);
+    }
+  }
+
+  Future<void> fetchPlaceDetailsWithoutLoading(String placeId) async {
+    try {
+      final response = await _placesRepository.getPlaceDetails(
+        request: GetPlaceDetailsRequest(placeId: placeId),
+      );
+      state = state.copyWith(
+        detail: {placeId: response},
+      );
+    } catch (e) {
+      state = state.copyWith(
+          error: e as AppErrorCode);
+    }
+  }
+
+  Future<void> loadFavoritePlaces() async {
+    state = state.copyWith(isLoading: true);
+    try {
+      final places = await _databaseService.getFavorites();
+      state = state.copyWith(
+        isLoading: false,
+        favoritePlaceIds: places.map((place) => place.id).toSet(),
+      );
+    } catch (e) {
+      state = state.copyWith(
+          isLoading: false, error: e as AppErrorCode);
+    }
+}
+
+  Future<void> loadFavoritePlacesWithoutLoading() async {
+    try {
+      final places = await _databaseService.getFavorites();
+      state = state.copyWith(
+        favoritePlaceIds: places.map((place) => place.id).toSet(),
+      );
+    } catch (e) {
+      state = state.copyWith(error: e as AppErrorCode);
     }
   }
 }

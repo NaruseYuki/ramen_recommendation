@@ -21,8 +21,7 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
        placeDetailViewmodel = ref.read(placeDetailViewModelProvider.notifier);
-       placeDetailViewmodel.fetchPlaceDetails(widget.placeId);
-
+       placeDetailViewmodel.fetchInitialData(widget.placeId);
     });
   }
 
