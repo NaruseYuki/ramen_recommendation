@@ -17,7 +17,9 @@ class _FavoritePlacesScreenState extends ConsumerState<FavoritePlacesScreen> {
   void initState() {
     super.initState();
     // 初回のみ呼び出す
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(favoritePlacesViewModelProvider.notifier).loadFavoriteShops();
+    });
   }
 
   @override

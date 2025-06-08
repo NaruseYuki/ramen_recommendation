@@ -1,7 +1,4 @@
-import 'package:ramen_recommendation/api/requests/get_place_details_request.dart';
-import 'package:ramen_recommendation/api/responses/get_place_details_response.dart';
 import 'package:ramen_recommendation/errors/app_error_code.dart';
-import 'package:ramen_recommendation/repositories/interfaces/places_repository_interface.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:ramen_recommendation/models/ramen_state.dart';
 import 'package:ramen_recommendation/models/ramen_place.dart';
@@ -13,12 +10,10 @@ part 'favorite_places_viewmodel.g.dart';
 @riverpod
 class FavoritePlacesViewModel extends _$FavoritePlacesViewModel {
   late final DatabaseService _databaseService;
-  late final PlacesRepositoryInterface _placeDetailsRepository;
 
   @override
   RamenState build() {
     _databaseService = ref.watch(databaseServiceProvider);
-    _placeDetailsRepository = ref.watch(placeDetailsRepositoryProvider);
     return RamenState();
   }
 
@@ -34,7 +29,7 @@ class FavoritePlacesViewModel extends _$FavoritePlacesViewModel {
       );
     } catch (e) {
       state = state.copyWith(
-          isLoading: false, error: AppErrorCode.databaseUnknownError());
+          isLoading: false, error: e as AppErrorCode);
     }
   }
 
@@ -63,28 +58,6 @@ class FavoritePlacesViewModel extends _$FavoritePlacesViewModel {
           places: [...state.places, place],
         );
       }
-    }
-    if (!result) {
-      state = state.copyWith(
-          isLoading: false, error: AppErrorCode.databaseUnknownError());
-    }
-  }
-
-  /// 店舗詳細を取得
-  /// Place Details API を呼び出す
-  Future<GetPlaceDetailsResponse?> fetchPlaceDetails(String placeId) async {
-    state = state.copyWith(isLoading: true);
-    try {
-      final response = await _placeDetailsRepository.getPlaceDetails(
-        request: GetPlaceDetailsRequest(placeId: placeId),
-      );
-      state = state.copyWith(isLoading: false);
-      return response;
-    } catch (e) {
-      // 必要に応じてエラーハンドリングを追加
-      state = state.copyWith(
-          error: AppErrorCode.mapUnknownError(), isLoading: false);
-      return null;
     }
   }
 }

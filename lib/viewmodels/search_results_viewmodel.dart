@@ -1,3 +1,4 @@
+import 'package:geolocator/geolocator.dart';
 import 'package:ramen_recommendation/api/providers/service_providers.dart';
 import 'package:ramen_recommendation/models/ramen_state.dart';
 import 'package:ramen_recommendation/repositories/interfaces/places_repository_interface.dart';
@@ -16,9 +17,17 @@ class SearchResultsViewModel extends _$SearchResultsViewModel {
     return RamenState();
   }
 
-  Future<bool> searchRamenPlaces(String keyword, dynamic position) async {
+  /// ラーメン店を検索
+  Future<bool> searchRamenPlaces(String keyword) async {
     state = state.copyWith(isLoading: true);
+
     try {
+      final position = await getCurrentLocation();
+      if (position == null) {
+        state = state.copyWith(
+            error: AppErrorCode.mapPermissionDenied(), isLoading: false);
+        return false;
+      }
       final response = await _placesRepository.searchRamenPlaces(
         request: SearchRamenPlacesRequest(
           position: position,
@@ -29,8 +38,35 @@ class SearchResultsViewModel extends _$SearchResultsViewModel {
       return true;
     } catch (e) {
       state = state.copyWith(
-          error: AppErrorCode.mapUnknownError(), isLoading: false);
+          error: e as AppErrorCode, isLoading: false);
       return false;
     }
+  }
+
+/// 現在地を取得する
+Future<Position?> getCurrentLocation() async {
+  final serviceEnabled = await Geolocator.isLocationServiceEnabled();
+  if (!serviceEnabled) {
+    return Future.error('位置情報サービスが無効です。設定から有効にしてください。');
+  }
+
+  LocationPermission permission = await Geolocator.checkPermission();
+  if (permission == LocationPermission.denied) {
+    permission = await Geolocator.requestPermission();
+    if (permission == LocationPermission.denied) {
+      return Future.error('位置情報の権限が拒否されました。');
+    }
+  }
+
+  if (permission == LocationPermission.deniedForever) {
+    return Future.error('位置情報の権限が永久に拒否されています。設定から権限を許可してください。');
+  }
+
+  return await Geolocator.getCurrentPosition(
+    locationSettings: const LocationSettings(
+      accuracy: LocationAccuracy.high,
+      distanceFilter: 10,
+    ),
+  );
   }
 }

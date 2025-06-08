@@ -18,9 +18,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    homeViewModel = ref.read(homeViewModelProvider.notifier);
-    // 必要があれば初期化処理をここで行う
-    homeViewModel.loadModel();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      homeViewModel = ref.read(homeViewModelProvider.notifier);
+      // 必要があれば初期化処理をここで行う
+      homeViewModel.loadModel();
+    });
   }
 
   @override
@@ -132,7 +134,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ? null
             : () {
           final route = MaterialPageRoute(
-            builder: (context) => SearchResultsScreen(ramenType: keyword),
+            builder: (context) => SearchResultsScreen(
+              ramenType: keyword
+            ),
           );
           Navigator.push(context, route);
         },
