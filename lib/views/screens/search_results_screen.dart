@@ -18,7 +18,7 @@ class _SearchResultsScreenState extends ConsumerState<SearchResultsScreen> {
     super.initState();
     // 一度だけ初期処理を実行
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(searchResultsViewModelProvider.notifier).searchRamenPlaces(widget.ramenType,);
+      ref.read(searchResultsViewModelProvider.notifier).searchRamenPlaces(widget.ramenType);
     });
   }
 

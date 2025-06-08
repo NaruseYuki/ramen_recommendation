@@ -13,11 +13,14 @@ class FavoritePlacesScreen extends ConsumerStatefulWidget {
 }
 
 class _FavoritePlacesScreenState extends ConsumerState<FavoritePlacesScreen> {
+  late FavoritePlacesViewModel favoritePlacesViewModel;
+
   @override
   void initState() {
     super.initState();
     // 初回のみ呼び出す
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      favoritePlacesViewModel = ref.read(favoritePlacesViewModelProvider.notifier);
       ref.read(favoritePlacesViewModelProvider.notifier).loadFavoriteShops();
     });
   }
@@ -25,7 +28,6 @@ class _FavoritePlacesScreenState extends ConsumerState<FavoritePlacesScreen> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(favoritePlacesViewModelProvider);
-    final viewModel = ref.read(favoritePlacesViewModelProvider.notifier);
 
     return Scaffold(
       appBar: AppBar(
@@ -50,7 +52,7 @@ class _FavoritePlacesScreenState extends ConsumerState<FavoritePlacesScreen> {
                 color: isFavorite ? Colors.amber : null,
               ),
               onPressed: () async {
-                await viewModel.toggleFavorite(place);
+                await favoritePlacesViewModel.toggleFavorite(place);
               },
             ),
             onTap: () {

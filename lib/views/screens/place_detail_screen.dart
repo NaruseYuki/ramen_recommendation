@@ -8,7 +8,6 @@ import 'package:url_launcher/url_launcher.dart';
 
 class PlaceDetailScreen extends ConsumerStatefulWidget {
   final String placeId;
-
   const PlaceDetailScreen({super.key, required this.placeId});
 
   @override
@@ -16,18 +15,20 @@ class PlaceDetailScreen extends ConsumerStatefulWidget {
 }
 
 class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
+  late PlaceDetailViewModel placeDetailViewmodel;
   @override
   void initState() {
     super.initState();
-      final state = ref.read(placeDetailViewModelProvider);
-        ref.read(placeDetailViewModelProvider.notifier).fetchPlaceDetails(widget.placeId);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(placeDetailViewModelProvider.notifier).fetchPlaceDetails(widget.placeId);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     final scaffoldMessenger = ScaffoldMessenger.of(context);
     final state = ref.watch(placeDetailViewModelProvider);
-    final viewModel = ref.read(placeDetailViewModelProvider.notifier);
+    final placeDetailViewModel = ref.read(placeDetailViewModelProvider.notifier);
 
     if (state.isLoading) {
       return const Scaffold(
@@ -54,7 +55,7 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(detail.name),
+        title: Text("お店の詳細"),
         actions: [
           IconButton(
             icon: Icon(
@@ -62,7 +63,7 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
               color: isFavorite ? Colors.amber : Colors.white,
             ),
             onPressed: () async {
-              final result = await viewModel.toggleFavorite(RamenPlace(
+              final result = await placeDetailViewModel.toggleFavorite(RamenPlace(
                 id: detail.id,
                 name: detail.name,
                 address: detail.address,
