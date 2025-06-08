@@ -1,41 +1,61 @@
 // lib/views/screens/place_detail_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:ramen_recommendation/api/responses/get_place_details_response.dart';
-import 'package:ramen_recommendation/app_initializer.dart';
 import 'package:ramen_recommendation/models/ramen_place.dart';
 import 'package:ramen_recommendation/models/review.dart';
+import 'package:ramen_recommendation/viewmodels/place_detail_viewmodel.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class PlaceDetailScreen extends ConsumerStatefulWidget {
-  final GetPlaceDetailsResponse details;
-  final AppInitializer appInitializer;
-
-  const PlaceDetailScreen({
-    super.key,
-    required this.details,
-    required this.appInitializer,
-  });
+  final String placeId;
+  const PlaceDetailScreen({super.key, required this.placeId});
 
   @override
   ConsumerState<PlaceDetailScreen> createState() => _PlaceDetailScreenState();
 }
 
 class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
+  late PlaceDetailViewModel placeDetailViewmodel;
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+       placeDetailViewmodel = ref.read(placeDetailViewModelProvider.notifier);
+       placeDetailViewmodel.fetchInitialData(widget.placeId);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final scaffoldMessenger = ScaffoldMessenger.of(context);
-    final favoritePlacesViewModel = ref
-        .read(widget.appInitializer.favoritePlacesViewModelProvider.notifier);
-    final favoriteState =
-        ref.watch(widget.appInitializer.favoritePlacesViewModelProvider);
+    final state = ref.watch(placeDetailViewModelProvider);
 
-    final isFavorite =
-        favoriteState.places.any((place) => place.id == widget.details.id);
+    if (state.isLoading) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (state.error != null) {
+      return Scaffold(
+        appBar: AppBar(),
+        body: Center(child: Text('エラー: ${state.error}')),
+      );
+    }
+
+    if (!state.detail.containsKey(widget.placeId)) {
+      return Scaffold(
+        appBar: AppBar(),
+        body: const Center(child: Text('店舗情報が取得できませんでした')),
+      );
+    }
+
+    final detail = state.detail[widget.placeId]!;
+    final isFavorite = state.favoritePlaceIds.contains(detail.id);
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.details.name),
+        title: Text(detail.name),
         actions: [
           IconButton(
             icon: Icon(
@@ -43,13 +63,12 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
               color: isFavorite ? Colors.amber : Colors.white,
             ),
             onPressed: () async {
-              final result =
-                  await favoritePlacesViewModel.toggleFavorite(RamenPlace(
-                id: widget.details.id,
-                name: widget.details.name,
-                address: widget.details.address,
-                latitude: widget.details.latitude,
-                longitude: widget.details.longitude,
+              final result = await placeDetailViewmodel.toggleFavorite(RamenPlace(
+                id: detail.id,
+                name: detail.name,
+                address: detail.address,
+                latitude: detail.latitude,
+                longitude: detail.longitude,
               ));
               scaffoldMessenger.showSnackBar(
                 SnackBar(
@@ -69,40 +88,40 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: _buildPlaceDetails(context),
+            children: _buildPlaceDetails(context, detail),
           ),
         ),
       ),
     );
   }
 
-  List<Widget> _buildPlaceDetails(BuildContext context) {
+  List<Widget> _buildPlaceDetails(BuildContext context, details) {
     List<Widget> list = [
       Text(
-        widget.details.name,
+        details.name,
         style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
       ),
       const SizedBox(height: 8),
       Text(
-        widget.details.address,
+        details.address,
         style: const TextStyle(fontSize: 16),
       ),
       const SizedBox(height: 16),
     ];
 
-    if (widget.details.rating != null) {
-      list.add(_buildRating());
+    if (details.rating != null) {
+      list.add(_buildRating(details));
     }
-    if (widget.details.weekdayDescriptions.isNotEmpty) {
-      list.add(_buildOpeningHoursSection());
-    }
-
-    if (widget.details.reviews.isNotEmpty) {
-      list.add(_buildReviewsSection());
+    if (details.weekdayDescriptions.isNotEmpty) {
+      list.add(_buildOpeningHoursSection(details));
     }
 
-    if (widget.details.website != null) {
-      list.add(_buildWebsiteButton(context));
+    if (details.reviews.isNotEmpty) {
+      list.add(_buildReviewsSection(details));
+    }
+
+    if (details.website != null) {
+      list.add(_buildWebsiteButton(context, details));
     }
 
     list.add(
@@ -112,7 +131,7 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
           width: double.infinity,
           child: ElevatedButton(
             onPressed: () {
-              _launchMap(widget.details.latitude, widget.details.longitude);
+              _launchMap(details.latitude, details.longitude);
             },
             child: const Text('地図アプリで開く'),
           ),
@@ -122,7 +141,7 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
     return list;
   }
 
-  Widget _buildRating() {
+  Widget _buildRating(details) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -130,7 +149,7 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
           children: [
             const Icon(Icons.star, color: Colors.amber),
             Text(
-              '${widget.details.rating} (${widget.details.userRatingsTotal ?? 0}件の評価)',
+              '${details.rating} (${details.userRatingsTotal ?? 0}件の評価)',
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
           ],
@@ -140,7 +159,7 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
     );
   }
 
-  Widget _buildOpeningHoursSection() {
+  Widget _buildOpeningHoursSection(details) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -148,15 +167,13 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
           '営業時間',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        ...widget.details.weekdayDescriptions
-            .map((text) => Text(text))
-            .toList(),
+        ...details.weekdayDescriptions.map((text) => Text(text)).toList(),
         const SizedBox(height: 16),
       ],
     );
   }
 
-  Widget _buildWebsiteButton(BuildContext context) {
+  Widget _buildWebsiteButton(BuildContext context, details) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -165,7 +182,7 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
           child: SizedBox(
             width: double.infinity,
             child: ElevatedButton(
-              onPressed: () => _launchWebsite(widget.details.website!),
+              onPressed: () => _launchWebsite(details.website!),
               child: const Text('ウェブサイト'),
             ),
           ),
@@ -175,7 +192,7 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
     );
   }
 
-  Widget _buildReviewsSection() {
+  Widget _buildReviewsSection(details) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -183,9 +200,7 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
           '口コミ',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        ...widget.details.reviews
-            .map((review) => _buildReviewTile(review))
-            .toList(),
+        ...details.reviews.map((review) => _buildReviewTile(review)).toList(),
         const SizedBox(height: 16),
       ],
     );

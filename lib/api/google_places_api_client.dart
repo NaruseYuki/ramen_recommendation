@@ -3,14 +3,18 @@ import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 
 class GooglePlacesApiClient {
+  static final GooglePlacesApiClient _instance =
+      GooglePlacesApiClient._internal();
   late final String _apiKey;
 
-  GooglePlacesApiClient() {
-    _loadApiKey();
+  factory GooglePlacesApiClient() {
+    return _instance;
   }
 
+  GooglePlacesApiClient._internal();
+
   /// 環境変数から API キーを読み込む
-  Future<void> _loadApiKey() async {
+  Future<void> initialize() async {
     const flavor = String.fromEnvironment('FLAVOR', defaultValue: 'dev');
     final envFileName = '.env.$flavor';
 

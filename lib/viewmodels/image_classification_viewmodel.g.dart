@@ -7,7 +7,7 @@ part of 'image_classification_viewmodel.dart';
 // **************************************************************************
 
 String _$imageClassificationViewModelHash() =>
-    r'98d4f8bcd4c4c5c9c5996b9482ea1a84163df8b3';
+    r'8cb33f60e75461f4f4000b64da8e1ce80125ebf8';
 
 /// Copied from Dart SDK
 class _SystemHash {

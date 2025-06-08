@@ -21,6 +21,11 @@ class ImageClassificationViewModel extends _$ImageClassificationViewModel {
     return RamenState();
   }
 
+  // 初期化時にモデルをロード
+  void init() {
+    loadModel();
+  }
+
   /// モデルのロード
   Future<void> loadModel() async {
     try {
@@ -75,10 +80,12 @@ Future<bool> requestCameraPermission() async {
 
 Future<bool> requestGalleryPermission() async {
   // Android 13以降はREAD_MEDIA_IMAGES、それ未満はREAD_EXTERNAL_STORAGE
-  if (await Permission.photos.isGranted || await Permission.photos.request().isGranted) {
+  if (await Permission.photos.isGranted ||
+      await Permission.photos.request().isGranted) {
     return true;
   }
-  if (await Permission.storage.isGranted || await Permission.storage.request().isGranted) {
+  if (await Permission.storage.isGranted ||
+      await Permission.storage.request().isGranted) {
     return true;
   }
   return false;
