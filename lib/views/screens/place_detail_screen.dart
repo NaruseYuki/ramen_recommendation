@@ -20,7 +20,9 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(placeDetailViewModelProvider.notifier).fetchPlaceDetails(widget.placeId);
+       placeDetailViewmodel = ref.read(placeDetailViewModelProvider.notifier);
+       placeDetailViewmodel.fetchPlaceDetails(widget.placeId);
+
     });
   }
 
@@ -28,7 +30,6 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
   Widget build(BuildContext context) {
     final scaffoldMessenger = ScaffoldMessenger.of(context);
     final state = ref.watch(placeDetailViewModelProvider);
-    final placeDetailViewModel = ref.read(placeDetailViewModelProvider.notifier);
 
     if (state.isLoading) {
       return const Scaffold(
@@ -55,7 +56,7 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("お店の詳細"),
+        title: Text(detail.name),
         actions: [
           IconButton(
             icon: Icon(
@@ -63,7 +64,7 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
               color: isFavorite ? Colors.amber : Colors.white,
             ),
             onPressed: () async {
-              final result = await placeDetailViewModel.toggleFavorite(RamenPlace(
+              final result = await placeDetailViewmodel.toggleFavorite(RamenPlace(
                 id: detail.id,
                 name: detail.name,
                 address: detail.address,

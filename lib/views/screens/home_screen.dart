@@ -12,17 +12,33 @@ class HomeScreen extends ConsumerStatefulWidget {
   ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends ConsumerState<HomeScreen> {
+class _HomeScreenState extends ConsumerState<HomeScreen>
+    with WidgetsBindingObserver {
   late HomeViewModel homeViewModel;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       homeViewModel = ref.read(homeViewModelProvider.notifier);
-      // 必要があれば初期化処理をここで行う
-      homeViewModel.loadModel();
+      homeViewModel.stateInitialize();
     });
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused) {
+      // onResume時にRamenStateを初期化
+      ref.read(homeViewModelProvider.notifier).stateClear();
+    }
+    super.didChangeAppLifecycleState(state);
   }
 
   @override
@@ -50,11 +66,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         child: homeState.isLoading
             ? const CircularProgressIndicator()
             : SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: _buildContent(context, homeState),
-          ),
-        ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: _buildContent(context, homeState),
+                ),
+              ),
       ),
       bottomNavigationBar: homeState.isLoading
           ? const SizedBox.shrink()
@@ -133,13 +149,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         onPressed: isSearchDisabled
             ? null
             : () {
-          final route = MaterialPageRoute(
-            builder: (context) => SearchResultsScreen(
-              ramenType: keyword
-            ),
-          );
-          Navigator.push(context, route);
-        },
+                final route = MaterialPageRoute(
+                  builder: (context) => SearchResultsScreen(ramenType: keyword),
+                );
+                Navigator.push(context, route);
+              },
         child: Text(
           isSearchDisabled ? '検索できません' : '付近のラーメンを検索',
         ),

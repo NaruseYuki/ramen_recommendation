@@ -86,24 +86,36 @@ class HomeViewModel extends _$HomeViewModel {
       state = state.copyWith(error: e as AppErrorCode, isLoading: false);
     }
   }
+  /// カメラ権限リクエスト
+  Future<bool> requestCameraPermission() async {
+    final status = await Permission.camera.request();
+    return status.isGranted;
+  }
+
+  /// ギャラリー権限リクエスト
+  Future<bool> requestGalleryPermission() async {
+    // Android 13以降はREAD_MEDIA_IMAGES、それ未満はREAD_EXTERNAL_STORAGE
+    if (await Permission.photos.isGranted ||
+        await Permission.photos.request().isGranted) {
+      return true;
+    }
+    if (await Permission.storage.isGranted ||
+        await Permission.storage.request().isGranted) {
+      return true;
+    }
+    return false;
+  }
+
+  stateInitialize() {
+    log('HomeViewModel initialized');
+    loadModel();
+  }
+
+  stateClear() {
+    log('HomeViewModel cleared');
+    state = state.initialize();
+  }
 }
 
-/// カメラ権限リクエスト
-Future<bool> requestCameraPermission() async {
-  final status = await Permission.camera.request();
-  return status.isGranted;
-}
 
-/// ギャラリー権限リクエスト
-Future<bool> requestGalleryPermission() async {
-  // Android 13以降はREAD_MEDIA_IMAGES、それ未満はREAD_EXTERNAL_STORAGE
-  if (await Permission.photos.isGranted ||
-      await Permission.photos.request().isGranted) {
-    return true;
-  }
-  if (await Permission.storage.isGranted ||
-      await Permission.storage.request().isGranted) {
-    return true;
-  }
-  return false;
-}
+

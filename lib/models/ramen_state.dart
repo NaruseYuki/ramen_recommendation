@@ -41,4 +41,16 @@ class RamenState<T> {
       detail: detail ?? this.detail,
     );
   }
+
+  RamenState initialize() {
+    return RamenState<T>(
+      imageFile: null,
+      result: null,
+      isLoading: false,
+      error: null,
+      places: [],
+      favoritePlaceIds: {},
+      detail: {},
+    );
+  }
 }

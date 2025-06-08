@@ -57,7 +57,7 @@ class PlaceDetailViewModel extends _$PlaceDetailViewModel {
       );
     } catch (e) {
       state = state.copyWith(
-          error: AppErrorCode.mapUnknownError(), isLoading: false);
+          error: e as AppErrorCode, isLoading: false);
     }
   }
 }
