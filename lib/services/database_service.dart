@@ -68,10 +68,12 @@ class DatabaseService {
     return List.generate(maps.length, (i) {
       return RamenPlace(
         id: maps[i]['id'] as String,
-        name: maps[i]['name'] as String,
-        address: maps[i]['address'] as String,
-        latitude: maps[i]['latitude'] as double,
-        longitude: maps[i]['longitude'] as double,
+        displayName: DisplayName(text: maps[i]['name']),
+        address: maps[i]['address'],
+        location: Location(
+          latitude: maps[i]['latitude'] as double,
+          longitude: maps[i]['longitude'] as double,
+        )
       );
     });
   }

@@ -15,12 +15,13 @@ T _$identity<T>(T value) => value;
 
 /// @nodoc
 mixin _$RamenPlace {
-// const factory を使用するのが一般的
   String get id;
-  String get name;
+  @JsonKey(name: 'displayName')
+  DisplayName get displayName;
+  @JsonKey(name: 'formattedAddress')
   String get address;
-  double get latitude;
-  double get longitude;
+  @JsonKey(name: 'location')
+  Location get location;
 
   /// Create a copy of RamenPlace
   /// with the given fields replaced by the non-null parameter values.
@@ -38,22 +39,21 @@ mixin _$RamenPlace {
         (other.runtimeType == runtimeType &&
             other is RamenPlace &&
             (identical(other.id, id) || other.id == id) &&
-            (identical(other.name, name) || other.name == name) &&
+            (identical(other.displayName, displayName) ||
+                other.displayName == displayName) &&
             (identical(other.address, address) || other.address == address) &&
-            (identical(other.latitude, latitude) ||
-                other.latitude == latitude) &&
-            (identical(other.longitude, longitude) ||
-                other.longitude == longitude));
+            (identical(other.location, location) ||
+                other.location == location));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode =>
-      Object.hash(runtimeType, id, name, address, latitude, longitude);
+      Object.hash(runtimeType, id, displayName, address, location);
 
   @override
   String toString() {
-    return 'RamenPlace(id: $id, name: $name, address: $address, latitude: $latitude, longitude: $longitude)';
+    return 'RamenPlace(id: $id, displayName: $displayName, address: $address, location: $location)';
   }
 }
 
@@ -65,10 +65,12 @@ abstract mixin class $RamenPlaceCopyWith<$Res> {
   @useResult
   $Res call(
       {String id,
-      String name,
-      String address,
-      double latitude,
-      double longitude});
+      @JsonKey(name: 'displayName') DisplayName displayName,
+      @JsonKey(name: 'formattedAddress') String address,
+      @JsonKey(name: 'location') Location location});
+
+  $DisplayNameCopyWith<$Res> get displayName;
+  $LocationCopyWith<$Res> get location;
 }
 
 /// @nodoc
@@ -84,33 +86,48 @@ class _$RamenPlaceCopyWithImpl<$Res> implements $RamenPlaceCopyWith<$Res> {
   @override
   $Res call({
     Object? id = null,
-    Object? name = null,
+    Object? displayName = null,
     Object? address = null,
-    Object? latitude = null,
-    Object? longitude = null,
+    Object? location = null,
   }) {
     return _then(_self.copyWith(
       id: null == id
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
               as String,
-      name: null == name
-          ? _self.name
-          : name // ignore: cast_nullable_to_non_nullable
-              as String,
+      displayName: null == displayName
+          ? _self.displayName
+          : displayName // ignore: cast_nullable_to_non_nullable
+              as DisplayName,
       address: null == address
           ? _self.address
           : address // ignore: cast_nullable_to_non_nullable
               as String,
-      latitude: null == latitude
-          ? _self.latitude
-          : latitude // ignore: cast_nullable_to_non_nullable
-              as double,
-      longitude: null == longitude
-          ? _self.longitude
-          : longitude // ignore: cast_nullable_to_non_nullable
-              as double,
+      location: null == location
+          ? _self.location
+          : location // ignore: cast_nullable_to_non_nullable
+              as Location,
     ));
+  }
+
+  /// Create a copy of RamenPlace
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $DisplayNameCopyWith<$Res> get displayName {
+    return $DisplayNameCopyWith<$Res>(_self.displayName, (value) {
+      return _then(_self.copyWith(displayName: value));
+    });
+  }
+
+  /// Create a copy of RamenPlace
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $LocationCopyWith<$Res> get location {
+    return $LocationCopyWith<$Res>(_self.location, (value) {
+      return _then(_self.copyWith(location: value));
+    });
   }
 }
 
@@ -119,24 +136,23 @@ class _$RamenPlaceCopyWithImpl<$Res> implements $RamenPlaceCopyWith<$Res> {
 class _RamenPlace implements RamenPlace {
   const _RamenPlace(
       {required this.id,
-      required this.name,
-      required this.address,
-      required this.latitude,
-      required this.longitude});
+      @JsonKey(name: 'displayName') required this.displayName,
+      @JsonKey(name: 'formattedAddress') required this.address,
+      @JsonKey(name: 'location') required this.location});
   factory _RamenPlace.fromJson(Map<String, dynamic> json) =>
       _$RamenPlaceFromJson(json);
 
-// const factory を使用するのが一般的
   @override
   final String id;
   @override
-  final String name;
+  @JsonKey(name: 'displayName')
+  final DisplayName displayName;
   @override
+  @JsonKey(name: 'formattedAddress')
   final String address;
   @override
-  final double latitude;
-  @override
-  final double longitude;
+  @JsonKey(name: 'location')
+  final Location location;
 
   /// Create a copy of RamenPlace
   /// with the given fields replaced by the non-null parameter values.
@@ -159,22 +175,21 @@ class _RamenPlace implements RamenPlace {
         (other.runtimeType == runtimeType &&
             other is _RamenPlace &&
             (identical(other.id, id) || other.id == id) &&
-            (identical(other.name, name) || other.name == name) &&
+            (identical(other.displayName, displayName) ||
+                other.displayName == displayName) &&
             (identical(other.address, address) || other.address == address) &&
-            (identical(other.latitude, latitude) ||
-                other.latitude == latitude) &&
-            (identical(other.longitude, longitude) ||
-                other.longitude == longitude));
+            (identical(other.location, location) ||
+                other.location == location));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode =>
-      Object.hash(runtimeType, id, name, address, latitude, longitude);
+      Object.hash(runtimeType, id, displayName, address, location);
 
   @override
   String toString() {
-    return 'RamenPlace(id: $id, name: $name, address: $address, latitude: $latitude, longitude: $longitude)';
+    return 'RamenPlace(id: $id, displayName: $displayName, address: $address, location: $location)';
   }
 }
 
@@ -188,10 +203,14 @@ abstract mixin class _$RamenPlaceCopyWith<$Res>
   @useResult
   $Res call(
       {String id,
-      String name,
-      String address,
-      double latitude,
-      double longitude});
+      @JsonKey(name: 'displayName') DisplayName displayName,
+      @JsonKey(name: 'formattedAddress') String address,
+      @JsonKey(name: 'location') Location location});
+
+  @override
+  $DisplayNameCopyWith<$Res> get displayName;
+  @override
+  $LocationCopyWith<$Res> get location;
 }
 
 /// @nodoc
@@ -207,24 +226,338 @@ class __$RamenPlaceCopyWithImpl<$Res> implements _$RamenPlaceCopyWith<$Res> {
   @pragma('vm:prefer-inline')
   $Res call({
     Object? id = null,
-    Object? name = null,
+    Object? displayName = null,
     Object? address = null,
-    Object? latitude = null,
-    Object? longitude = null,
+    Object? location = null,
   }) {
     return _then(_RamenPlace(
       id: null == id
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
               as String,
-      name: null == name
-          ? _self.name
-          : name // ignore: cast_nullable_to_non_nullable
-              as String,
+      displayName: null == displayName
+          ? _self.displayName
+          : displayName // ignore: cast_nullable_to_non_nullable
+              as DisplayName,
       address: null == address
           ? _self.address
           : address // ignore: cast_nullable_to_non_nullable
               as String,
+      location: null == location
+          ? _self.location
+          : location // ignore: cast_nullable_to_non_nullable
+              as Location,
+    ));
+  }
+
+  /// Create a copy of RamenPlace
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $DisplayNameCopyWith<$Res> get displayName {
+    return $DisplayNameCopyWith<$Res>(_self.displayName, (value) {
+      return _then(_self.copyWith(displayName: value));
+    });
+  }
+
+  /// Create a copy of RamenPlace
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $LocationCopyWith<$Res> get location {
+    return $LocationCopyWith<$Res>(_self.location, (value) {
+      return _then(_self.copyWith(location: value));
+    });
+  }
+}
+
+/// @nodoc
+mixin _$DisplayName {
+  String get text;
+
+  /// Create a copy of DisplayName
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $DisplayNameCopyWith<DisplayName> get copyWith =>
+      _$DisplayNameCopyWithImpl<DisplayName>(this as DisplayName, _$identity);
+
+  /// Serializes this DisplayName to a JSON map.
+  Map<String, dynamic> toJson();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is DisplayName &&
+            (identical(other.text, text) || other.text == text));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, text);
+
+  @override
+  String toString() {
+    return 'DisplayName(text: $text)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $DisplayNameCopyWith<$Res> {
+  factory $DisplayNameCopyWith(
+          DisplayName value, $Res Function(DisplayName) _then) =
+      _$DisplayNameCopyWithImpl;
+  @useResult
+  $Res call({String text});
+}
+
+/// @nodoc
+class _$DisplayNameCopyWithImpl<$Res> implements $DisplayNameCopyWith<$Res> {
+  _$DisplayNameCopyWithImpl(this._self, this._then);
+
+  final DisplayName _self;
+  final $Res Function(DisplayName) _then;
+
+  /// Create a copy of DisplayName
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? text = null,
+  }) {
+    return _then(_self.copyWith(
+      text: null == text
+          ? _self.text
+          : text // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _DisplayName implements DisplayName {
+  const _DisplayName({required this.text});
+  factory _DisplayName.fromJson(Map<String, dynamic> json) =>
+      _$DisplayNameFromJson(json);
+
+  @override
+  final String text;
+
+  /// Create a copy of DisplayName
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$DisplayNameCopyWith<_DisplayName> get copyWith =>
+      __$DisplayNameCopyWithImpl<_DisplayName>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$DisplayNameToJson(
+      this,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _DisplayName &&
+            (identical(other.text, text) || other.text == text));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, text);
+
+  @override
+  String toString() {
+    return 'DisplayName(text: $text)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$DisplayNameCopyWith<$Res>
+    implements $DisplayNameCopyWith<$Res> {
+  factory _$DisplayNameCopyWith(
+          _DisplayName value, $Res Function(_DisplayName) _then) =
+      __$DisplayNameCopyWithImpl;
+  @override
+  @useResult
+  $Res call({String text});
+}
+
+/// @nodoc
+class __$DisplayNameCopyWithImpl<$Res> implements _$DisplayNameCopyWith<$Res> {
+  __$DisplayNameCopyWithImpl(this._self, this._then);
+
+  final _DisplayName _self;
+  final $Res Function(_DisplayName) _then;
+
+  /// Create a copy of DisplayName
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? text = null,
+  }) {
+    return _then(_DisplayName(
+      text: null == text
+          ? _self.text
+          : text // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
+  }
+}
+
+/// @nodoc
+mixin _$Location {
+  double get latitude;
+  double get longitude;
+
+  /// Create a copy of Location
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $LocationCopyWith<Location> get copyWith =>
+      _$LocationCopyWithImpl<Location>(this as Location, _$identity);
+
+  /// Serializes this Location to a JSON map.
+  Map<String, dynamic> toJson();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is Location &&
+            (identical(other.latitude, latitude) ||
+                other.latitude == latitude) &&
+            (identical(other.longitude, longitude) ||
+                other.longitude == longitude));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, latitude, longitude);
+
+  @override
+  String toString() {
+    return 'Location(latitude: $latitude, longitude: $longitude)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $LocationCopyWith<$Res> {
+  factory $LocationCopyWith(Location value, $Res Function(Location) _then) =
+      _$LocationCopyWithImpl;
+  @useResult
+  $Res call({double latitude, double longitude});
+}
+
+/// @nodoc
+class _$LocationCopyWithImpl<$Res> implements $LocationCopyWith<$Res> {
+  _$LocationCopyWithImpl(this._self, this._then);
+
+  final Location _self;
+  final $Res Function(Location) _then;
+
+  /// Create a copy of Location
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? latitude = null,
+    Object? longitude = null,
+  }) {
+    return _then(_self.copyWith(
+      latitude: null == latitude
+          ? _self.latitude
+          : latitude // ignore: cast_nullable_to_non_nullable
+              as double,
+      longitude: null == longitude
+          ? _self.longitude
+          : longitude // ignore: cast_nullable_to_non_nullable
+              as double,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _Location implements Location {
+  const _Location({required this.latitude, required this.longitude});
+  factory _Location.fromJson(Map<String, dynamic> json) =>
+      _$LocationFromJson(json);
+
+  @override
+  final double latitude;
+  @override
+  final double longitude;
+
+  /// Create a copy of Location
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$LocationCopyWith<_Location> get copyWith =>
+      __$LocationCopyWithImpl<_Location>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$LocationToJson(
+      this,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _Location &&
+            (identical(other.latitude, latitude) ||
+                other.latitude == latitude) &&
+            (identical(other.longitude, longitude) ||
+                other.longitude == longitude));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, latitude, longitude);
+
+  @override
+  String toString() {
+    return 'Location(latitude: $latitude, longitude: $longitude)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$LocationCopyWith<$Res>
+    implements $LocationCopyWith<$Res> {
+  factory _$LocationCopyWith(_Location value, $Res Function(_Location) _then) =
+      __$LocationCopyWithImpl;
+  @override
+  @useResult
+  $Res call({double latitude, double longitude});
+}
+
+/// @nodoc
+class __$LocationCopyWithImpl<$Res> implements _$LocationCopyWith<$Res> {
+  __$LocationCopyWithImpl(this._self, this._then);
+
+  final _Location _self;
+  final $Res Function(_Location) _then;
+
+  /// Create a copy of Location
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? latitude = null,
+    Object? longitude = null,
+  }) {
+    return _then(_Location(
       latitude: null == latitude
           ? _self.latitude
           : latitude // ignore: cast_nullable_to_non_nullable

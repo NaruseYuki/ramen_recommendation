@@ -39,8 +39,8 @@ class _SearchResultsScreenState extends ConsumerState<SearchResultsScreen> {
         itemBuilder: (context, index) {
           final place = locationState.places[index] as RamenPlace;
           return ListTile(
-            title: Text(place.name),
-            subtitle: Text(place.address),
+            title: Text(place.displayName.text ?? '店舗名がありません'),
+            subtitle: Text(place.address ?? '住所情報がありません'),
             onTap: () {
               Navigator.push(
                 context,

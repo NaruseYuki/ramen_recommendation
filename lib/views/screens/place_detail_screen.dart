@@ -63,13 +63,18 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
               color: isFavorite ? Colors.amber : Colors.white,
             ),
             onPressed: () async {
-              final result = await placeDetailViewmodel.toggleFavorite(RamenPlace(
-                id: detail.id,
-                name: detail.name,
-                address: detail.address,
-                latitude: detail.latitude,
-                longitude: detail.longitude,
-              ));
+              final result = await placeDetailViewmodel.toggleFavorite(
+                    RamenPlace(
+                        id: detail.id,
+                        displayName: DisplayName(text: detail.name),
+                        address: detail.address,
+                        location: Location(
+                            latitude: detail.latitude,
+                            longitude: detail.longitude
+                        ),
+              )
+
+              );
               scaffoldMessenger.showSnackBar(
                 SnackBar(
                   content: Text(
