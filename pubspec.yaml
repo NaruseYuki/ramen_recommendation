@@ -52,6 +52,7 @@ dependencies:
     sdk: flutter
   freezed_annotation: ^3.0.0
   json_annotation: ^4.9.0
+  easy_localization: ^3.0.7+1
 
 dev_dependencies:
   flutter_test:
@@ -92,6 +93,7 @@ flutter:
     - assets/NotoSansJP-Regular.ttf
     - .env.dev
     - .env.prod
+    - assets/translations/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

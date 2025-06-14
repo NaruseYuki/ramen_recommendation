@@ -107,12 +107,10 @@ class HomeViewModel extends _$HomeViewModel {
   }
 
   stateInitialize() {
-    log('HomeViewModel initialized');
     loadModel();
   }
 
   stateClear() {
-    log('HomeViewModel cleared');
     state = state.initialize();
   }
 }

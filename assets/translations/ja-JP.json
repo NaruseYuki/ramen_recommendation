@@ -1,0 +1,51 @@
+{
+  "@@locale": "ja",
+  "app_title": "推しメンアナライザ",
+  "home": {
+    "gallery_select": "ギャラリーから選択",
+    "camera_capture": "カメラで撮影",
+    "search_nearby": "付近のラーメンを検索",
+    "search_disabled": "検索できません",
+    "analysis_result": "分析結果: {}",
+    "error": "エラー: {}"
+  },
+  "favorite": {
+    "title": "お気に入り店舗",
+    "empty": "お気に入り店舗はありません",
+    "add_success": "お気に入りに追加しました",
+    "remove_success": "お気に入りから削除しました",
+    "update_failed": "お気に入りの更新に失敗しました",
+    "website_open_failed": "ウェブサイトを開くことができませんでした",
+    "map_open_failed": "地図アプリを開くことができませんでした"
+  },
+  "search_results": {
+    "title": "付近の{}の検索結果",
+    "not_found": "ラーメン店が見つかりませんでした"
+  },
+  "place_detail": {
+    "open_map": "地図アプリで開く",
+    "website": "ウェブサイト",
+    "opening_hours": "営業時間",
+    "reviews": "口コミ",
+    "no_reviews": "口コミなし",
+    "address_unknown": "住所不明",
+    "name_unknown": "名称不明",
+    "info_not_found": "店舗情報が取得できませんでした"
+  },
+  "common": {
+    "loading": "読み込み中...",
+    "ok": "OK",
+    "cancel": "キャンセル"
+  },
+  "error": {
+    "map_permission_denied": "位置情報の権限が拒否されました。",
+    "map_permission_denied_forever": "位置情報の権限が永久に拒否されています。設定から権限を許可してください。",
+    "map_service_disabled": "位置情報サービスが無効です。設定から有効にしてください。",
+    "map_unknown_error": "地図情報の取得に失敗しました。",
+    "database_unknown_error": "データベースエラーが発生しました。",
+    "common_invalid_parameter": "パラメータが不正です。",
+    "tensorflow_load_failed": "AIモデルのロードに失敗しました。",
+    "search_failed": "検索に失敗しました",
+    "detail_failed": "詳細情報の取得に失敗しました"
+  }
+}
