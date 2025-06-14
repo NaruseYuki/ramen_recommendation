@@ -44,8 +44,8 @@ class _FavoritePlacesScreenState extends ConsumerState<FavoritePlacesScreen> {
           final isFavorite =
           state.favoritePlaceIds.contains(place.id);
           return ListTile(
-            title: Text(place.name),
-            subtitle: Text(place.address),
+            title: Text(place.displayName.text ),
+            subtitle: Text(place.address ?? '住所情報がありません'),
             trailing: IconButton(
               icon: Icon(
                 isFavorite ? Icons.star : Icons.star_border,

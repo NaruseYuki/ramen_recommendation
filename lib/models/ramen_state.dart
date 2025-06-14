@@ -1,56 +1,36 @@
 // lib/models/ramen_state.dart
+// lib/models/ramen_state.dart
 import 'dart:io';
+import 'package:freezed_annotation/freezed_annotation.dart'; // Freezedのインポート
 import 'package:ramen_recommendation/api/responses/get_place_details_response.dart';
 
 import '../errors/app_error_code.dart';
 
-class RamenState<T> {
-  File? imageFile;
-  String? result;
-  bool isLoading;
-  AppErrorCode? error;
-  List<T> places; // ジェネリクス対応
-  Set<String> favoritePlaceIds;
-  Map<String, GetPlaceDetailsResponse> detail;
+part 'ramen_state.freezed.dart';
 
-  RamenState(
-      {this.imageFile,
-      this.result,
-      this.isLoading = false,
-      this.error,
-      this.places = const [],
-      this.favoritePlaceIds = const {},
-      this.detail = const {}});
+@Freezed(genericArgumentFactories: true) // ジェネリック型を使用するためのアノテーション
+abstract class RamenState<T> with _$RamenState<T> {
+  const RamenState._(); // プライベートなコンストラクタを定義
 
-  RamenState<T> copyWith({
+  const factory RamenState({
     File? imageFile,
     String? result,
-    bool? isLoading,
+    @Default(false) bool isLoading, // デフォルト値: false
     AppErrorCode? error,
-    List<T>? places,
-    Set<String>? favoritePlaceIds,
-    Map<String, GetPlaceDetailsResponse>? detail,
-  }) {
-    return RamenState<T>(
-      imageFile: imageFile ?? this.imageFile,
-      result: result ?? this.result,
-      isLoading: isLoading ?? this.isLoading,
-      error: error ?? this.error,
-      places: places ?? this.places,
-      favoritePlaceIds: favoritePlaceIds ?? this.favoritePlaceIds,
-      detail: detail ?? this.detail,
-    );
-  }
+    @Default([]) List<T> places, // デフォルト値: 空のリスト
+    @Default({}) Set<String> favoritePlaceIds, // デフォルト値: 空のセット
+    @Default({}) Map<String, GetPlaceDetailsResponse> detail, // デフォルト値: 空のマップ
+  }) = _RamenState; // プライベートな具象クラス名 (_RamenState) を指定
 
-  RamenState initialize() {
-    return RamenState<T>(
-      imageFile: null,
-      result: null,
-      isLoading: false,
-      error: null,
-      places: [],
-      favoritePlaceIds: {},
-      detail: {},
-    );
+    RamenState initialize() {
+      return RamenState(
+        imageFile: null,
+        result: null,
+        isLoading: false,
+        error: null,
+        places: [],
+        favoritePlaceIds: {},
+        detail: {},
+      );
   }
 }

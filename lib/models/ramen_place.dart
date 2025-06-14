@@ -1,37 +1,35 @@
-class RamenPlace {
-  final String id;
-  final String name;
-  final String address;
-  final double latitude;
-  final double longitude;
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-  RamenPlace(
-      {required this.id,
-      required this.name,
-      required this.address,
-      required this.latitude,
-      required this.longitude});
+part 'ramen_place.freezed.dart';
+part 'ramen_place.g.dart'; // JSONシリアライズ/デシリアライズ用に追加
 
-  /// JSON から `RamenPlace` を生成
-  factory RamenPlace.fromJson(Map<String, dynamic> json) {
-    final location = json['location'] ?? {};
-    return RamenPlace(
-      id: json['id'] ?? '',
-      name: json['displayName']['text'] ?? '名称不明',
-      address: json['formattedAddress'] ?? '住所不明',
-      latitude: location['latitude'] ?? 0.0,
-      longitude: location['longitude'] ?? 0.0,
-    );
-  }
 
-  /// `RamenPlace` を JSON に変換
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-      'address': address,
-      'latitude': latitude,
-      'longitude': longitude,
-    };
-  }
+@freezed
+abstract class RamenPlace with _$RamenPlace {
+  const factory RamenPlace({
+    required String id,
+    @JsonKey(name:'displayName') required DisplayName displayName,
+    @JsonKey(name:'formattedAddress')required String address,
+    @JsonKey(name:'location') required Location location,
+  }) = _RamenPlace;
+  factory RamenPlace.fromJson(Map<String, dynamic> json) => _$RamenPlaceFromJson(json);
+}
+
+@freezed
+abstract  class DisplayName with _$DisplayName {
+  const factory DisplayName({
+    required String text
+  }) = _DisplayName;
+
+  factory DisplayName.fromJson(Map<String, dynamic> json) => _$DisplayNameFromJson(json);
+}
+
+@freezed
+abstract class Location with _$Location {
+  const factory Location({
+    required double latitude,
+    required double longitude,
+  }) = _Location;
+
+  factory Location.fromJson(Map<String, dynamic> json) => _$LocationFromJson(json);
 }
