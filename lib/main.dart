@@ -1,4 +1,5 @@
 // lib/main.dart
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ramen_recommendation/api/google_places_api_client.dart';
@@ -7,11 +8,17 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await EasyLocalization.ensureInitialized();
   // GooglePlacesApiClientの初期化
   await GooglePlacesApiClient().initialize();
   runApp(
-    ProviderScope(
-      child: MyApp(),
+        EasyLocalization(
+          supportedLocales: [Locale('ja', 'JP')], // 日本語
+          path: 'assets/translations', // 翻訳ファイルのパス
+          fallbackLocale: Locale('ja', 'JP'), // フォールバックロケール
+          child:ProviderScope(
+            child: MyApp(),
+        )
     ),
   );
 }
@@ -21,15 +28,16 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ezContext = EasyLocalization.of(context)!;
     return MaterialApp(
       localizationsDelegates: [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
+        ezContext.delegate // EasyLocalizationのデリゲート
       ],
-      supportedLocales: const [
-        Locale('ja', 'JP'), // 日本語
-      ],
+      supportedLocales: ezContext.supportedLocales,
+      locale: ezContext.locale,
       debugShowCheckedModeBanner: false,
       theme: _buildThemeData(),
       home: HomeScreen(),

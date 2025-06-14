@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ramen_recommendation/models/ramen_state.dart';
@@ -47,7 +48,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('推しメンアナライザ'),
+        title: Text('app_title'.tr()),
         actions: [
           IconButton(
             icon: const Icon(Icons.star),
@@ -104,7 +105,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             );
           }
         },
-        child: const Text('ギャラリーから選択'),
+        child: Text('home.gallery_select'.tr()),
       ),
       ElevatedButton(
         onPressed: () async {
@@ -115,18 +116,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             );
           }
         },
-        child: const Text('カメラで撮影'),
+        child: Text('home.camera_capture'.tr()),
       ),
     ]);
 
     if (state.result != null) {
-      children.add(Text('分析結果: ${state.result}'));
+      children.add(Text('home.analysis_result'.tr(args: [state.result ?? ''])));
     }
 
     if (state.error != null) {
       children.add(
         Text(
-          'エラー: ${state.error}',
+          'home.error'.tr(args: [state.error.toString()]),
           style: const TextStyle(color: Colors.red),
         ),
       );
@@ -155,7 +156,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                 Navigator.push(context, route);
               },
         child: Text(
-          isSearchDisabled ? '検索できません' : '付近のラーメンを検索',
+          isSearchDisabled
+              ? 'home.search_disabled'.tr()
+              : 'home.search_nearby'.tr(),
         ),
       ),
     );

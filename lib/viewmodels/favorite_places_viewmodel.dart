@@ -34,30 +34,27 @@ class FavoritePlacesViewModel extends _$FavoritePlacesViewModel {
   }
 
   /// お気に入り追加・削除
-  Future<void> toggleFavorite(RamenPlace place) async {
-    state = state.copyWith(isLoading: true);
+  Future<bool> toggleFavorite(RamenPlace place) async {
     final placeId = place.id;
     bool result = false;
     if (state.favoritePlaceIds.contains(placeId)) {
       result = await _databaseService.removeFavorite(placeId);
       if (result) {
         state = state.copyWith(
-          isLoading: false,
           favoritePlaceIds: Set.from(state.favoritePlaceIds)..remove(placeId),
-          places: state.places
-              .where((p) => (p as RamenPlace).id != placeId)
-              .toList(),
         );
       }
     } else {
       result = await _databaseService.addFavorite(place);
       if (result) {
         state = state.copyWith(
-          isLoading: false,
           favoritePlaceIds: Set.from(state.favoritePlaceIds)..add(placeId),
-          places: [...state.places, place],
         );
       }
     }
+    if (!result) {
+      state = state.copyWith(error: AppErrorCode.databaseUnknownError());
+    }
+    return result;
   }
 }
