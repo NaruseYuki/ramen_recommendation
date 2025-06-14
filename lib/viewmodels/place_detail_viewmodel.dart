@@ -80,7 +80,9 @@ class PlaceDetailViewModel extends _$PlaceDetailViewModel {
         request: GetPlaceDetailsRequest(placeId: placeId),
       );
       state = state.copyWith(
-        detail: {placeId: response},
+        detail: {
+          placeId: response
+        },
       );
     } catch (e) {
       state = state.copyWith(
