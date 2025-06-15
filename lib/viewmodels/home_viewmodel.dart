@@ -107,6 +107,7 @@ class HomeViewModel extends _$HomeViewModel {
   }
 
   stateInitialize() {
+    loadModel();
   }
 
   stateClear() {
