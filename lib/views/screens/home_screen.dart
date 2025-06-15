@@ -128,7 +128,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       children.add(
         Text(
           'home.error'.tr(args: [state.error.toString()]),
-          style: const TextStyle(color: Colors.red),
+          style: const TextStyle(
+              color: Colors.red,
+              fontWeight: FontWeight.bold,
+          ),
+          textAlign: TextAlign.center,
         ),
       );
     }

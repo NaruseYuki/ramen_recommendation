@@ -25,7 +25,7 @@ class AppErrorCode {
       '${module.name.toUpperCase()}-${category.name.toUpperCase()}-${code.toString().padLeft(3, '0')}';
 
   @override
-  String toString() => errorCode;
+  String toString() => "$errorCode\n$message" ;
 
   /// エラーコードに対応するエラーメッセージを取得
   String get message => ErrorMessageManager.getErrorMessage(this);
