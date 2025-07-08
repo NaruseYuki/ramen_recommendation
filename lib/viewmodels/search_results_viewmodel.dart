@@ -30,7 +30,8 @@ class SearchResultsViewModel extends _$SearchResultsViewModel {
       }
       final response = await _placesRepository.searchRamenPlaces(
         request: SearchRamenPlacesRequest(
-          position: position,
+          latitude: position.latitude,
+          longitude: position.longitude,
           keyword: keyword,
         ),
       );
@@ -38,7 +39,7 @@ class SearchResultsViewModel extends _$SearchResultsViewModel {
       return true;
     } catch (e) {
       state = state.copyWith(
-          error: e as AppErrorCode, isLoading: false);
+          error: AppErrorCode.commonInvalidParameter(), isLoading: false);
       return false;
     }
   }

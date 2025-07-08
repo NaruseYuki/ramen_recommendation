@@ -59,28 +59,8 @@ final databaseServiceProvider = AutoDisposeProvider<DatabaseService>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef DatabaseServiceRef = AutoDisposeProviderRef<DatabaseService>;
-String _$googlePlacesApiClientHash() =>
-    r'54e669dd1a8f84a7aeb5a876193b25f7a4fde31c';
-
-/// See also [googlePlacesApiClient].
-@ProviderFor(googlePlacesApiClient)
-final googlePlacesApiClientProvider =
-    AutoDisposeProvider<GooglePlacesApiClient>.internal(
-  googlePlacesApiClient,
-  name: r'googlePlacesApiClientProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$googlePlacesApiClientHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef GooglePlacesApiClientRef
-    = AutoDisposeProviderRef<GooglePlacesApiClient>;
 String _$placeDetailsRepositoryHash() =>
-    r'c6bbaeefb9ff971265c0c6b57420ebdd5a4215f5';
+    r'6b1f9e42195bd966b30c193c0284a2afb62fcb27';
 
 /// See also [placeDetailsRepository].
 @ProviderFor(placeDetailsRepository)
