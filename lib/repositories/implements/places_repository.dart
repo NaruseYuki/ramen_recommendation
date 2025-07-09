@@ -1,12 +1,10 @@
-import 'dart:developer';
-
-import 'package:flutter/services.dart';
 import 'package:ramen_recommendation/api/requests/get_place_details_request.dart';
 import 'package:ramen_recommendation/api/responses/get_place_details_response.dart';
 import 'package:ramen_recommendation/api/responses/search_ramen_places_response.dart';
 import 'package:ramen_recommendation/repositories/interfaces/places_repository_interface.dart';
 import '../../api/google_places_api_client.dart';
 import '../../api/requests/search_ramen_places_request.dart';
+import '../../utils/util.kt.dart';
 
 class PlacesRepository implements PlacesRepositoryInterface {
   final GooglePlacesApiClient apiClient;
@@ -41,17 +39,4 @@ class PlacesRepository implements PlacesRepositoryInterface {
       throw Exception('Failed to fetch place details: $e');
     }
   }
-}
-
-/// 環境変数から API キーを読み込む
-Future<String> getAPIKey() async {
-  const flavor = String.fromEnvironment('FLAVOR', defaultValue: 'dev');
-  final envFileName = '.env.$flavor';
-
-  final envData = await rootBundle.loadString(envFileName);
-  final label = envData.split('\n');
-  return label
-      .firstWhere((line) => line.startsWith('GOOGLE_MAPS_API_KEY'))
-      .split(' ')[1]
-      .trim();
 }
