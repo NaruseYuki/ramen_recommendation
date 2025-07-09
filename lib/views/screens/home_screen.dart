@@ -1,48 +1,53 @@
-// lib/views/screens/home_screen.dart
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:ramen_recommendation/app_initializer.dart';
-import 'package:ramen_recommendation/viewmodels/image_classification_viewmodel.dart';
-import 'package:ramen_recommendation/viewmodels/location_viewmodel.dart';
+import 'package:ramen_recommendation/models/ramen_state.dart';
+import 'package:ramen_recommendation/viewmodels/home_viewmodel.dart';
 import 'package:ramen_recommendation/views/screens/favorite_places_screen.dart';
 import 'package:ramen_recommendation/views/screens/search_results_screen.dart';
 
-import '../../models/ramen_state.dart';
-
 class HomeScreen extends ConsumerStatefulWidget {
-  final AppInitializer appInitializer;
-  const HomeScreen({super.key, required this.appInitializer});
-  // AppInitializer を引数に取るコンストラクタを追加
+  const HomeScreen({super.key});
 
   @override
   ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends ConsumerState<HomeScreen> {
-  late final ImageClassificationViewModel imageClassificationViewModel;
-  late final LocationViewModel locationViewModel;
+class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObserver {
+  late HomeViewModel homeViewModel;
 
   @override
   void initState() {
     super.initState();
-    imageClassificationViewModel = ref.read(
-        widget.appInitializer.imageClassificationViewModelProvider.notifier);
-    locationViewModel =
-        ref.read(widget.appInitializer.locationViewModelProvider.notifier);
-    imageClassificationViewModel.loadModel();
+    WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      homeViewModel = ref.read(homeViewModelProvider.notifier);
+      homeViewModel.stateInitialize();
+    });
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused) {
+      // onResume時にRamenStateを初期化
+      ref.read(homeViewModelProvider.notifier).stateClear();
+    }
+    super.didChangeAppLifecycleState(state);
   }
 
   @override
   Widget build(BuildContext context) {
-    // ここでローカル変数として取得
-    final imageState =
-        ref.watch(widget.appInitializer.imageClassificationViewModelProvider);
-    final locationState =
-        ref.watch(widget.appInitializer.locationViewModelProvider);
+    final homeState = ref.watch(homeViewModelProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('推しメンアナライザ'),
+        title: Text('app_title'.tr()),
         actions: [
           IconButton(
             icon: const Icon(Icons.star),
@@ -50,8 +55,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => FavoritePlacesScreen(
-                      appInitializer: widget.appInitializer),
+                  builder: (context) => const FavoritePlacesScreen(),
                 ),
               );
             },
@@ -59,74 +63,70 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ],
       ),
       body: Center(
-        child: locationState.isLoading
+        child: homeState.isLoading
             ? const CircularProgressIndicator()
             : SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: _buildContent(context, imageState),
-          ),
-        ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: _buildContent(context, homeState),
+                ),
+              ),
       ),
-      bottomNavigationBar: locationState.isLoading
+      bottomNavigationBar: homeState.isLoading
           ? const SizedBox.shrink()
-          :_buildBottomBar(context, imageState, locationState),
+          : _buildBottomBar(context, homeState),
     );
   }
 
-  Widget _buildContent(BuildContext context, RamenState imageState) {
+  Widget _buildContent(BuildContext context, RamenState state) {
+    final scaffoldManager = ScaffoldMessenger.of(context);
     List<Widget> children = [];
-     final scaffoldManager = ScaffoldMessenger.of(context);
 
-    if (imageState.imageFile == null) {
+    if (state.imageFile == null) {
       children.add(const Text('画像を選択してください'));
-    } else if (imageState.imageFile != null) {
+    } else {
       children.add(
         Image.file(
-          imageState.imageFile!,
+          state.imageFile!,
           width: 300,
           height: 300,
         ),
       );
     }
+
     children.addAll([
       ElevatedButton(
         onPressed: () async {
-          if (await requestGalleryPermission()) {
-            await imageClassificationViewModel.pickImageFromGallery();
-          } else {
+          await homeViewModel.pickImageFromGalleryWithPermission();
+          if (state.error != null) {
             scaffoldManager.showSnackBar(
-              const SnackBar(content: Text('ギャラリーへのアクセスが許可されていません')),
+              SnackBar(content: Text(state.error.toString())),
             );
           }
         },
-        child: const Text('ギャラリーから選択'),
+        child: Text('home.gallery_select'.tr()),
       ),
       ElevatedButton(
         onPressed: () async {
-          if (await requestCameraPermission()) {
-            await imageClassificationViewModel.pickImageFromCamera();
-          } else {
-            scaffoldManager.showSnackBar(
-              const SnackBar(content: Text('カメラへのアクセスが許可されていません')),
-            );
-          }
+          await homeViewModel.pickImageFromCameraWithPermission();
         },
-        child: const Text('カメラで撮影'),
+        child: Text('home.camera_capture'.tr()),
       ),
     ]);
 
-    if (imageState.isLoading) {
-      children.add(const CircularProgressIndicator());
-    } else if (imageState.result != null) {
-      children.add(Text('分析結果: ${imageState.result}'));
+    if (state.result != null) {
+      children.add(Text('home.analysis_result'.tr(args: [state.result ?? ''])));
     }
 
-    if (imageState.error != null) {
+    if (state.error != null) {
       children.add(
         Text(
-          'エラー: ${imageState.error}',
-          style: const TextStyle(color: Colors.red),
+          'home.error'.tr(args: [state.error.toString()]),
+          style: const TextStyle(
+              color: Colors.red,
+              fontWeight: FontWeight.bold,
+          ),
+          textAlign: TextAlign.center,
         ),
       );
     }
@@ -137,38 +137,27 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  Widget _buildBottomBar(
-      BuildContext context, RamenState imageState, RamenState locationState) {
+  Widget _buildBottomBar(BuildContext context, RamenState state) {
     final isSearchDisabled =
-        imageState.result == null || imageState.result?.split(' ')[0] == '4';
+        state.result == null || state.result?.split(' ')[0] == '4';
+    final keyword = state.result?.split(' ')[1] ?? '';
 
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: ElevatedButton(
         onPressed: isSearchDisabled
             ? null
-            : () async {
-                final scaffold = ScaffoldMessenger.of(context);
-                final navigation = Navigator.of(context);
-                final keyword = imageState.result?.split(' ')[1] ?? '';
-                final success = await locationViewModel
-                    .searchRamenPlaces(keyword);
-                if (success) {
-                  final route = MaterialPageRoute(
-                    builder: (context) => SearchResultsScreen(
-                        ramenType: keyword,
-                        appInitializer: widget.appInitializer),
-                  );
-                  navigation.push(route);
-                } else {
-                  scaffold.showSnackBar(
-                    const SnackBar(content: Text('検索に失敗しました')),
-                  );
-                }
+            : () {
+                final route = MaterialPageRoute(
+                  builder: (context) => SearchResultsScreen(ramenType: keyword),
+                );
+                Navigator.push(context, route);
               },
         child: Text(
-                isSearchDisabled ? '検索できません' : '付近のラーメンを検索',
-              ),
+          isSearchDisabled
+              ? 'home.search_disabled'.tr()
+              : 'home.search_nearby'.tr(),
+        ),
       ),
     );
   }

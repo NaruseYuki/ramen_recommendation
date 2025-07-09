@@ -1,41 +1,65 @@
 // lib/views/screens/place_detail_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:ramen_recommendation/api/responses/get_place_details_response.dart';
-import 'package:ramen_recommendation/app_initializer.dart';
 import 'package:ramen_recommendation/models/ramen_place.dart';
 import 'package:ramen_recommendation/models/review.dart';
+import 'package:ramen_recommendation/viewmodels/place_detail_viewmodel.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class PlaceDetailScreen extends ConsumerStatefulWidget {
-  final GetPlaceDetailsResponse details;
-  final AppInitializer appInitializer;
-
-  const PlaceDetailScreen({
-    super.key,
-    required this.details,
-    required this.appInitializer,
-  });
+  final String placeId;
+  const PlaceDetailScreen({super.key, required this.placeId});
 
   @override
   ConsumerState<PlaceDetailScreen> createState() => _PlaceDetailScreenState();
 }
 
 class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
+  late PlaceDetailViewModel placeDetailViewmodel;
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      placeDetailViewmodel = ref.read(placeDetailViewModelProvider.notifier);
+      placeDetailViewmodel.fetchInitialData(widget.placeId);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final scaffoldMessenger = ScaffoldMessenger.of(context);
-    final favoritePlacesViewModel = ref
-        .read(widget.appInitializer.favoritePlacesViewModelProvider.notifier);
-    final favoriteState =
-        ref.watch(widget.appInitializer.favoritePlacesViewModelProvider);
+    final state = ref.watch(placeDetailViewModelProvider);
 
-    final isFavorite =
-        favoriteState.places.any((place) => place.id == widget.details.id);
+    if (state.isLoading) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    // エラー
+    if (state.error != null) {
+      return Scaffold(
+        appBar: AppBar(),
+        body: Center(
+            child: Text('home.error'.tr(args: [state.error.toString()]))),
+      );
+    }
+
+    // 店舗情報取得失敗
+    if (!state.detail.containsKey(widget.placeId)) {
+      return Scaffold(
+        appBar: AppBar(),
+        body: Center(child: Text('place_detail.info_not_found'.tr())),
+      );
+    }
+
+    final detail = state.detail[widget.placeId]!;
+    final isFavorite = state.favoritePlaceIds.contains(detail.id);
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.details.name),
+        title: Text(detail.name),
         actions: [
           IconButton(
             icon: Icon(
@@ -44,19 +68,21 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
             ),
             onPressed: () async {
               final result =
-                  await favoritePlacesViewModel.toggleFavorite(RamenPlace(
-                id: widget.details.id,
-                name: widget.details.name,
-                address: widget.details.address,
-                latitude: widget.details.latitude,
-                longitude: widget.details.longitude,
+                  await placeDetailViewmodel.toggleFavorite(RamenPlace(
+                id: detail.id,
+                displayName: DisplayName(text: detail.name),
+                address: detail.address,
+                location: Location(
+                    latitude: detail.latitude, longitude: detail.longitude),
               ));
               scaffoldMessenger.showSnackBar(
                 SnackBar(
                   content: Text(
                     result
-                        ? (isFavorite ? 'お気に入りから削除しました' : 'お気に入りに追加しました')
-                        : 'お気に入りの更新に失敗しました',
+                        ? (isFavorite
+                            ? 'favorite.remove_success'.tr()
+                            : 'favorite.add_success'.tr())
+                        : 'favorite.update_failed'.tr(),
                   ),
                 ),
               );
@@ -69,40 +95,40 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: _buildPlaceDetails(context),
+            children: _buildPlaceDetails(context, detail),
           ),
         ),
       ),
     );
   }
 
-  List<Widget> _buildPlaceDetails(BuildContext context) {
+  List<Widget> _buildPlaceDetails(BuildContext context, details) {
     List<Widget> list = [
       Text(
-        widget.details.name,
+        details.name,
         style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
       ),
       const SizedBox(height: 8),
       Text(
-        widget.details.address,
+        details.address,
         style: const TextStyle(fontSize: 16),
       ),
       const SizedBox(height: 16),
     ];
 
-    if (widget.details.rating != null) {
-      list.add(_buildRating());
+    if (details.rating != null) {
+      list.add(_buildRating(details));
     }
-    if (widget.details.weekdayDescriptions.isNotEmpty) {
-      list.add(_buildOpeningHoursSection());
-    }
-
-    if (widget.details.reviews.isNotEmpty) {
-      list.add(_buildReviewsSection());
+    if (details.weekdayDescriptions.isNotEmpty) {
+      list.add(_buildOpeningHoursSection(details));
     }
 
-    if (widget.details.website != null) {
-      list.add(_buildWebsiteButton(context));
+    if (details.reviews.isNotEmpty) {
+      list.add(_buildReviewsSection(details));
+    }
+
+    if (details.website != null) {
+      list.add(_buildWebsiteButton(context, details));
     }
 
     list.add(
@@ -112,9 +138,9 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
           width: double.infinity,
           child: ElevatedButton(
             onPressed: () {
-              _launchMap(widget.details.latitude, widget.details.longitude);
+              _launchMap(details.name);
             },
-            child: const Text('地図アプリで開く'),
+            child: Text('place_detail.open_map'.tr()),
           ),
         ),
       ),
@@ -122,7 +148,7 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
     return list;
   }
 
-  Widget _buildRating() {
+  Widget _buildRating(details) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -130,7 +156,7 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
           children: [
             const Icon(Icons.star, color: Colors.amber),
             Text(
-              '${widget.details.rating} (${widget.details.userRatingsTotal ?? 0}件の評価)',
+              '${details.rating} (${details.userRatingsTotal ?? 0}件の評価)',
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
           ],
@@ -140,23 +166,21 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
     );
   }
 
-  Widget _buildOpeningHoursSection() {
+  Widget _buildOpeningHoursSection(details) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          '営業時間',
-          style: TextStyle(fontWeight: FontWeight.bold),
+        Text(
+          'place_detail.opening_hours'.tr(),
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
-        ...widget.details.weekdayDescriptions
-            .map((text) => Text(text))
-            .toList(),
+        ...details.weekdayDescriptions.map((text) => Text(text)).toList(),
         const SizedBox(height: 16),
       ],
     );
   }
 
-  Widget _buildWebsiteButton(BuildContext context) {
+  Widget _buildWebsiteButton(BuildContext context, details) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -165,8 +189,8 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
           child: SizedBox(
             width: double.infinity,
             child: ElevatedButton(
-              onPressed: () => _launchWebsite(widget.details.website!),
-              child: const Text('ウェブサイト'),
+              onPressed: () => _launchWebsite(details.website!),
+              child: Text('place_detail.website'.tr()),
             ),
           ),
         ),
@@ -175,17 +199,16 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
     );
   }
 
-  Widget _buildReviewsSection() {
+  Widget _buildReviewsSection(details) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          '口コミ',
-          style: TextStyle(fontWeight: FontWeight.bold),
+        Text(
+          'place_detail.reviews'.tr(),
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
-        ...widget.details.reviews
-            .map((review) => _buildReviewTile(review))
-            .toList(),
+        ...details.reviews.map((review) => _buildReviewTile(review)).toList(),
+        if (details.reviews.isEmpty) Text('place_detail.no_reviews'.tr()),
         const SizedBox(height: 16),
       ],
     );
@@ -226,13 +249,13 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
     );
   }
 
-  Future<void> _launchMap(double latitude, double longitude) async {
+  Future<void> _launchMap(String name) async {
     final url = Uri.parse(
-        'https://www.google.com/maps/search/?api=1&query=$latitude,$longitude');
+        'https://www.google.com/maps?q=$name');
     if (await canLaunchUrl(url)) {
       await launchUrl(url);
     } else {
-      throw '地図アプリを開けません';
+      throw 'place_detail.map_open_failed'.tr();
     }
   }
 
@@ -241,7 +264,7 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
     if (await canLaunchUrl(url)) {
       await launchUrl(url);
     } else {
-      throw 'ウェブサイトを開けません';
+      throw 'place_detail.website_open_failed'.tr();
     }
   }
 }

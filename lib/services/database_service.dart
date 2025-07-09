@@ -27,7 +27,7 @@ class DatabaseService {
         return db.execute('''
           CREATE TABLE favorites (
             id TEXT PRIMARY KEY,
-            name TEXT,
+            display_name TEXT,
             address TEXT,
             latitude REAL,
             longitude REAL
@@ -40,10 +40,21 @@ class DatabaseService {
   Future<bool> addFavorite(RamenPlace place) async {
     try {
       final db = await database;
-      await db.insert('favorites', place.toJson(),
-          conflictAlgorithm: ConflictAlgorithm.replace);
+      // RamenPlaceオブジェクトをデータベースのフラットなカラム構造にマッピング
+      await db.insert(
+        'favorites',
+        {
+          'id': place.id,
+          'display_name': place.displayName.text, // DisplayNameからtextを取り出す
+          'address': place.address,
+          'latitude': place.location.latitude, // Locationからlatitudeを取り出す
+          'longitude': place.location.longitude, // Locationからlongitudeを取り出す
+        },
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
       return true;
     } catch (e) {
+      throw Exception('Failed to add favorite: $e');
       return false;
     }
   }
@@ -68,10 +79,12 @@ class DatabaseService {
     return List.generate(maps.length, (i) {
       return RamenPlace(
         id: maps[i]['id'] as String,
-        name: maps[i]['name'] as String,
-        address: maps[i]['address'] as String,
-        latitude: maps[i]['latitude'] as double,
-        longitude: maps[i]['longitude'] as double,
+        displayName: DisplayName(text: maps[i]['display_name']),
+        address: maps[i]['address'],
+        location: Location(
+          latitude: maps[i]['latitude'] as double,
+          longitude: maps[i]['longitude'] as double,
+        )
       );
     });
   }

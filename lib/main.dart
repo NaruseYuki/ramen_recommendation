@@ -1,60 +1,43 @@
 // lib/main.dart
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:ramen_recommendation/api/google_places_api_client.dart';
-import 'package:ramen_recommendation/app_initializer.dart';
-import 'package:ramen_recommendation/repositories/implements/places_repository.dart';
-import 'package:ramen_recommendation/services/database_service.dart';
-import 'package:ramen_recommendation/services/image_picker_service.dart';
-import 'package:ramen_recommendation/services/tflite_service.dart';
 import 'package:ramen_recommendation/views/screens/home_screen.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  // 必要なサービスを初期化
-  final tfliteService = TFLiteService();
-  final imagePickerService = ImagePickerService();
-  final googlePlacesApiClient = GooglePlacesApiClient();
-  final placesRepository = PlacesRepository(googlePlacesApiClient);
-  final databaseService = DatabaseService();
-
-  // AppInitializer をインスタンス化して初期化
-  final appInitializer = AppInitializer(
-    tfliteService: tfliteService,
-    imagePickerService: imagePickerService,
-    googlePlacesApiClient: googlePlacesApiClient,
-    placesRepository: placesRepository,
-    databaseService: databaseService,
-  );
-  await appInitializer.initialize();
+  await EasyLocalization.ensureInitialized();
   runApp(
-    ProviderScope(
-      child: MyApp(appInitializer: appInitializer),
+        EasyLocalization(
+          supportedLocales: [Locale('ja', 'JP')], // 日本語
+          path: 'assets/translations', // 翻訳ファイルのパス
+          fallbackLocale: Locale('ja', 'JP'), // フォールバックロケール
+          child:ProviderScope(
+            child: MyApp(),
+        )
     ),
   );
 }
 
 class MyApp extends StatelessWidget {
-  final AppInitializer appInitializer;
-
-  const MyApp({super.key, required this.appInitializer});
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final ezContext = EasyLocalization.of(context)!;
     return MaterialApp(
       localizationsDelegates: [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
+        ezContext.delegate // EasyLocalizationのデリゲート
       ],
-      supportedLocales: const [
-        Locale('ja', 'JP'), // 日本語
-      ],
+      supportedLocales: ezContext.supportedLocales,
+      locale: ezContext.locale,
       debugShowCheckedModeBanner: false,
       theme: _buildThemeData(),
-      home: HomeScreen(appInitializer: appInitializer),
+      home: HomeScreen(),
     );
   }
 
