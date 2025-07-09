@@ -19,7 +19,6 @@ class HomeViewModel extends _$HomeViewModel {
   RamenState build() {
     _tfliteService = ref.watch(tfliteServiceProvider);
     _imagePickerService = ref.watch(imagePickerServiceProvider);
-    // 必要ならここで初期化処理
     return RamenState();
   }
   /// モデルのロード

@@ -1,20 +1,24 @@
-import 'package:geolocator/geolocator.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-class SearchRamenPlacesRequest {
-  final String keyword;
-  final Position position;
-  final int pageSize;
-  final String languageCode;
-  final double radius;
+part 'search_ramen_places_request.freezed.dart';
+part 'search_ramen_places_request.g.dart';
 
-  SearchRamenPlacesRequest({
-    required this.keyword,
-    required this.position,
-    this.pageSize = 10,
-    this.languageCode = 'ja',
-    this.radius = 500.0,
-  });
+@Freezed(toJson: false)
+abstract class SearchRamenPlacesRequest with _$SearchRamenPlacesRequest {
+  const factory SearchRamenPlacesRequest({
+    required String keyword,
+    required double latitude,
+    required double longitude,
+    @Default(10) int pageSize,
+    @Default('ja') String languageCode,
+    @Default(500.0) double radius,
+  }) = _SearchRamenPlacesRequest;
 
+  factory SearchRamenPlacesRequest.fromJson(Map<String, dynamic> json) =>
+      _$SearchRamenPlacesRequestFromJson(json);
+}
+
+extension SearchRamenPlacesRequestToJson on SearchRamenPlacesRequest {
   Map<String, dynamic> toRequestBody() {
     return {
       'textQuery': keyword,
@@ -23,8 +27,8 @@ class SearchRamenPlacesRequest {
       'locationBias': {
         'circle': {
           'center': {
-            'latitude': position.latitude,
-            'longitude': position.longitude,
+            'latitude': latitude,
+            'longitude': longitude,
           },
           'radius': radius,
         },

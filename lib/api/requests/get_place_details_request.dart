@@ -7,7 +7,11 @@ class GetPlaceDetailsRequest {
     required this.placeId,
     this.languageCode = 'ja',
     this.fields =
-        'id,displayName,formattedAddress,currentOpeningHours,rating,userRatingCount,websiteUri,reviews,location',
+        'id,displayName,'
+            'formattedAddress,'
+            'currentOpeningHours,'
+            'rating,userRatingCount,'
+            'websiteUri,reviews,location',
   });
 
   Map<String, String> toQueryParams() {

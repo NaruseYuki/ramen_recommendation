@@ -2,15 +2,12 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:ramen_recommendation/api/google_places_api_client.dart';
 import 'package:ramen_recommendation/views/screens/home_screen.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
-  // GooglePlacesApiClientの初期化
-  await GooglePlacesApiClient().initialize();
   runApp(
         EasyLocalization(
           supportedLocales: [Locale('ja', 'JP')], // 日本語

@@ -13,8 +13,7 @@ class HomeScreen extends ConsumerStatefulWidget {
   ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends ConsumerState<HomeScreen>
-    with WidgetsBindingObserver {
+class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObserver {
   late HomeViewModel homeViewModel;
 
   @override
@@ -110,11 +109,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       ElevatedButton(
         onPressed: () async {
           await homeViewModel.pickImageFromCameraWithPermission();
-          if (state.error != null) {
-            scaffoldManager.showSnackBar(
-              SnackBar(content: Text(state.error.toString())),
-            );
-          }
         },
         child: Text('home.camera_capture'.tr()),
       ),
