@@ -60,7 +60,7 @@ final databaseServiceProvider = AutoDisposeProvider<DatabaseService>.internal(
 // ignore: unused_element
 typedef DatabaseServiceRef = AutoDisposeProviderRef<DatabaseService>;
 String _$placeDetailsRepositoryHash() =>
-    r'6b1f9e42195bd966b30c193c0284a2afb62fcb27';
+    r'c502d8cd64ce97ee6ddff27d138ddff973e141b0';
 
 /// See also [placeDetailsRepository].
 @ProviderFor(placeDetailsRepository)
