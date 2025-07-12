@@ -4,7 +4,9 @@ import 'package:ramen_recommendation/models/ramen_state.dart';
 import 'package:ramen_recommendation/repositories/interfaces/places_repository_interface.dart';
 import 'package:ramen_recommendation/api/requests/search_ramen_places_request.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import '../api/responses/search_ramen_places_response.dart';
 import '../errors/app_error_code.dart';
+import '../repositories/result.dart';
 
 part 'search_results_viewmodel.g.dart';
 
@@ -21,25 +23,28 @@ class SearchResultsViewModel extends _$SearchResultsViewModel {
   Future<bool> searchRamenPlaces(String keyword) async {
     state = state.copyWith(isLoading: true);
 
-    try {
-      final position = await getCurrentLocation();
-      if (position == null) {
-        state = state.copyWith(
-            error: AppErrorCode.mapPermissionDenied(), isLoading: false);
-        return false;
-      }
-      final response = await _placesRepository.searchRamenPlaces(
-        request: SearchRamenPlacesRequest(
-          latitude: position.latitude,
-          longitude: position.longitude,
-          keyword: keyword,
-        ),
-      );
-      state = state.copyWith(places: response.places, isLoading: false);
-      return true;
-    } catch (e) {
+    final position = await getCurrentLocation();
+    if (position == null) {
       state = state.copyWith(
-          error: AppErrorCode.commonInvalidParameter(), isLoading: false);
+          error: AppErrorCode.mapPermissionDenied(), isLoading: false);
+      return false;
+    }
+    final result = await _placesRepository.searchRamenPlaces(
+      request: SearchRamenPlacesRequest(
+        latitude: position.latitude,
+        longitude: position.longitude,
+        keyword: keyword,
+      ),
+    );
+
+    if (result is Success<SearchRamenPlacesResponse, AppErrorCode>) {
+      state = state.copyWith(places: result.value.places, isLoading: false);
+      return true;
+    } else if (result is Failure<SearchRamenPlacesResponse, AppErrorCode>) {
+      state = state.copyWith(error: result.exception, isLoading: false);
+      return false;
+    } else {
+      state = state.copyWith(error: AppErrorCode.commonSystemError(), isLoading: false);
       return false;
     }
   }
