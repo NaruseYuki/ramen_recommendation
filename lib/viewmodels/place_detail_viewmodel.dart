@@ -5,7 +5,9 @@ import 'package:ramen_recommendation/services/database_service.dart';
 import 'package:ramen_recommendation/models/ramen_state.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:ramen_recommendation/api/providers/service_providers.dart';
+import '../api/responses/get_place_details_response.dart';
 import '../errors/app_error_code.dart';
+import '../repositories/result.dart';
 
 part 'place_detail_viewmodel.g.dart';
 
@@ -23,95 +25,113 @@ class PlaceDetailViewModel extends _$PlaceDetailViewModel {
 
   Future<bool> toggleFavorite(RamenPlace place) async {
     final placeId = place.id;
-    bool result = false;
+    Result<bool, AppErrorCode> dbResult;
+
     if (state.favoritePlaceIds.contains(placeId)) {
-      result = await _databaseService.removeFavorite(placeId);
-      if (result) {
-        state = state.copyWith(
-          favoritePlaceIds: Set.from(state.favoritePlaceIds)..remove(placeId),
-        );
-      }
+      dbResult = await _databaseService.removeFavorite(placeId);
     } else {
-      result = await _databaseService.addFavorite(place);
-      if (result) {
-        state = state.copyWith(
-          favoritePlaceIds: Set.from(state.favoritePlaceIds)..add(placeId),
-        );
+      dbResult = await _databaseService.addFavorite(place);
+    }
+
+    if (dbResult is Success<bool, AppErrorCode>) {
+      if (dbResult.value) {
+        if (state.favoritePlaceIds.contains(placeId)) {
+          state = state.copyWith(
+            favoritePlaceIds: Set.from(state.favoritePlaceIds)..remove(placeId),
+          );
+        } else {
+          state = state.copyWith(
+            favoritePlaceIds: Set.from(state.favoritePlaceIds)..add(placeId),
+          );
+        }
+        return true;
+      } else {
+        state = state.copyWith(error: AppErrorCode.databaseUnknownError());
+        return false;
       }
+    } else if (dbResult is Failure<bool, AppErrorCode>) {
+      state = state.copyWith(error: dbResult.exception);
+      return false;
+    } else {
+      state = state.copyWith(error: AppErrorCode.commonSystemError());
+      return false;
     }
-    if (!result) {
-      state = state.copyWith(error: AppErrorCode.databaseUnknownError());
-    }
-    return result;
   }
 
   fetchInitialData(String placeId) async {
     state = state.copyWith(isLoading: true);
-    try {
-      // 初期データのロード処理をここに追加
-      await loadFavoritePlacesWithoutLoading();
-      await fetchPlaceDetailsWithoutLoading(placeId);
-      state = state.copyWith(isLoading: false);
-    } catch (e) {
-      state = state.copyWith(
-          error: e as AppErrorCode, isLoading: false);
-    }
+    // 初期データのロード処理をここに追加
+    await loadFavoritePlacesWithoutLoading();
+    await fetchPlaceDetailsWithoutLoading(placeId);
+    state = state.copyWith(isLoading: false);
   }
 
   Future<void> fetchPlaceDetails(String placeId) async {
     state = state.copyWith(isLoading: true);
-    try {
-      final response = await _placesRepository.getPlaceDetails(
-        request: GetPlaceDetailsRequest(placeId: placeId),
-      );
+    final result = await _placesRepository.getPlaceDetails(
+      request: GetPlaceDetailsRequest(placeId: placeId),
+    );
+
+    if (result is Success<GetPlaceDetailsResponse, AppErrorCode>) {
       state = state.copyWith(
         isLoading: false,
-        detail: {placeId: response},
+        detail: {placeId: result.value},
       );
-    } catch (e) {
+    } else if (result is Failure<GetPlaceDetailsResponse, AppErrorCode>) {
       state = state.copyWith(
-          error: e as AppErrorCode, isLoading: false);
+          error: result.exception, isLoading: false);
+    } else {
+      state = state.copyWith(error: AppErrorCode.commonSystemError(), isLoading: false);
     }
   }
 
   Future<void> fetchPlaceDetailsWithoutLoading(String placeId) async {
-    try {
-      final response = await _placesRepository.getPlaceDetails(
-        request: GetPlaceDetailsRequest(placeId: placeId),
-      );
+    final result = await _placesRepository.getPlaceDetails(
+      request: GetPlaceDetailsRequest(placeId: placeId),
+    );
+
+    if (result is Success<GetPlaceDetailsResponse, AppErrorCode>) {
       state = state.copyWith(
         detail: {
-          placeId: response
+          placeId: result.value
         },
       );
-    } catch (e) {
+    } else if (result is Failure<GetPlaceDetailsResponse, AppErrorCode>) {
       state = state.copyWith(
-          error: e as AppErrorCode);
+          error: result.exception);
+    } else {
+      state = state.copyWith(error: AppErrorCode.commonSystemError());
     }
   }
 
   Future<void> loadFavoritePlaces() async {
     state = state.copyWith(isLoading: true);
-    try {
-      final places = await _databaseService.getFavorites();
+    final result = await _databaseService.getFavorites();
+
+    if (result is Success<List<RamenPlace>, AppErrorCode>) {
       state = state.copyWith(
         isLoading: false,
-        favoritePlaceIds: places.map((place) => place.id).toSet(),
+        favoritePlaceIds: result.value.map((place) => place.id).toSet(),
       );
-    } catch (e) {
+    } else if (result is Failure<List<RamenPlace>, AppErrorCode>) {
       state = state.copyWith(
-          isLoading: false, error: e as AppErrorCode);
+          isLoading: false, error: result.exception);
+    } else {
+      state = state.copyWith(isLoading: false, error: AppErrorCode.commonSystemError());
     }
-}
+  }
 
   Future<void> loadFavoritePlacesWithoutLoading() async {
-    try {
-      final places = await _databaseService.getFavorites();
+    final result = await _databaseService.getFavorites();
+
+    if (result is Success<List<RamenPlace>, AppErrorCode>) {
       state = state.copyWith(
-        favoritePlaceIds: places.map((place) => place.id).toSet(),
+        favoritePlaceIds: result.value.map((place) => place.id).toSet(),
       );
-    } catch (e) {
-      state = state.copyWith(error: e as AppErrorCode);
+    } else if (result is Failure<List<RamenPlace>, AppErrorCode>) {
+      state = state.copyWith(error: result.exception);
+    } else {
+      state = state.copyWith(error: AppErrorCode.commonSystemError());
     }
   }
 }

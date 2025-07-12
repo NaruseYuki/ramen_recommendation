@@ -7,6 +7,7 @@ import 'package:image/image.dart' as img;
 import 'dart:developer'; //log()を使用するために追加
 
 import '../errors/app_error_code.dart';
+import '../repositories/result.dart';
 
 class TFLiteService {
   Interpreter? _interpreter;
@@ -20,25 +21,26 @@ class TFLiteService {
   TFLiteService._internal();
 
   /// モデルとラベルをロード
-  Future<void> loadModel() async {
+  Future<Result<void, AppErrorCode>> loadModel() async {
     try {
       // モデルをロード
       _interpreter =
-          await Interpreter.fromAsset('assets/ramen_model.tflite'); // モデルのパスを指定
+      await Interpreter.fromAsset('assets/ramen_model.tflite'); // モデルのパスを指定
 
       // ラベルをロード
       final labelsData = await rootBundle
           .loadString('assets/ramen_model_labels.txt'); // ラベルファイルのパスを指定
       _labels = labelsData.split('\n');
+      return const Success(null); // 成功した場合はnullを返す
     } catch (e) {
-      throw AppErrorCode.tensorFlowLiteLoadFailed();
+      return Failure(AppErrorCode.tensorFlowLiteLoadFailed());
     }
   }
 
   /// 画像分類を実行
-  Future<String> classifyImage(File image) async {
+  Future<Result<String, AppErrorCode>> classifyImage(File image) async {
     if (_interpreter == null || _labels == null) {
-      throw AppErrorCode.tensorFlowLiteLoadFailed();
+      return Failure(AppErrorCode.tensorFlowLiteLoadFailed());
     }
 
     try {
@@ -73,11 +75,20 @@ class TFLiteService {
 
       // 結果を解釈
       final output = outputBuffer[0].toList();
+      // outputが空でないことを確認
+      if (output.isEmpty) {
+        return Failure(AppErrorCode.tensorFlowLiteUnknownError());
+      }
       final maxIndex = output.indexOf(
           output.reduce((int curr, int next) => curr > next ? curr : next));
-      return _labels![maxIndex];
+
+      // maxIndexが_labelsの範囲内にあることを確認
+      if (maxIndex < 0 || maxIndex >= _labels!.length) {
+        return Failure(AppErrorCode.tensorFlowLiteUnknownError());
+      }
+      return Success(_labels![maxIndex]);
     } catch (e) {
-      throw AppErrorCode.tensorFlowLiteUnknownError();
+      return Failure(AppErrorCode.tensorFlowLiteUnknownError());
     }
   }
 

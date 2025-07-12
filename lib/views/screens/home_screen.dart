@@ -118,19 +118,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
       children.add(Text('home.analysis_result'.tr(args: [state.result ?? ''])));
     }
 
-    if (state.error != null) {
-      children.add(
-        Text(
-          'home.error'.tr(args: [state.error.toString()]),
-          style: const TextStyle(
-              color: Colors.red,
-              fontWeight: FontWeight.bold,
-          ),
-          textAlign: TextAlign.center,
-        ),
-      );
-    }
-
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: children,

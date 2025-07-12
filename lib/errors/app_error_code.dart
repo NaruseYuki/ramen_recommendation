@@ -10,7 +10,9 @@ enum ErrorCategory {
   input, // 入力値エラー
   network, // ネットワークエラー
   timeout, // タイムアウトエラー
-  denied, // 拒否されたエラー
+  appPermissionDenied, // アプリ権限が拒否されたエラー
+  httpPermission, // http権限エラー
+  serviceUnavailable, // サービス利用不可
 }
 
 /// エラーコードを管理するクラス
@@ -39,6 +41,14 @@ class AppErrorCode {
       AppErrorCode(ErrorModule.common, ErrorCategory.invalid, 3);
   static AppErrorCode commonTimeoutError() =>
       AppErrorCode(ErrorModule.common, ErrorCategory.timeout, 4);
+  static AppErrorCode commonAuthenticationError() =>
+      AppErrorCode(ErrorModule.common, ErrorCategory.authentication, 5);
+  static AppErrorCode commonPermissionDenied() =>
+      AppErrorCode(ErrorModule.common, ErrorCategory.httpPermission, 6);
+  static AppErrorCode commonNotFound() =>
+      AppErrorCode(ErrorModule.common, ErrorCategory.notFound, 7);
+  static AppErrorCode commonServiceUnavailable() =>
+      AppErrorCode(ErrorModule.common, ErrorCategory.serviceUnavailable, 8);
   static AppErrorCode imageInvalidFormat() =>
       AppErrorCode(ErrorModule.image, ErrorCategory.invalid, 1);
   static AppErrorCode imageFileSizeExceeded() =>
@@ -64,11 +74,11 @@ class AppErrorCode {
   static AppErrorCode mapConnectionFailed() =>
       AppErrorCode(ErrorModule.map, ErrorCategory.connection, 1);
   static AppErrorCode mapPermissionDenied() =>
-      AppErrorCode(ErrorModule.map, ErrorCategory.denied, 1);
+      AppErrorCode(ErrorModule.map, ErrorCategory.appPermissionDenied, 1);
   static AppErrorCode cameraPermissionDenied() =>
-      AppErrorCode(ErrorModule.camera, ErrorCategory.denied, 2);
+      AppErrorCode(ErrorModule.camera, ErrorCategory.appPermissionDenied, 2);
   static AppErrorCode galleryPermissionDenied() =>
-      AppErrorCode(ErrorModule.gallery, ErrorCategory.denied, 3);
+      AppErrorCode(ErrorModule.gallery, ErrorCategory.appPermissionDenied, 3);
 }
 
 /// エラーメッセージを管理するクラス
@@ -77,7 +87,7 @@ class ErrorMessageManager {
     AppErrorCode.commonSystemError().errorCode: 'システムエラーが発生しました。',
     AppErrorCode.commonNetworkError().errorCode: 'ネットワークエラーが発生しました。',
     AppErrorCode.commonInvalidParameter().errorCode: '不正なパラメータが検出されました。',
-    AppErrorCode.commonTimeoutError().errorCode: '処理がタイムアウトしました。',
+    AppErrorCode.commonTimeoutError().errorCode: 'アクセスがタイムアウトしました。\nしばらくしてから再度お試しください。',
     AppErrorCode.imageInvalidFormat().errorCode:
         '画像ファイルの形式が不正です。\nサポートされている画像形式（JPEG、PNG）を使用してください。',
     AppErrorCode.imageFileSizeExceeded().errorCode:
@@ -108,6 +118,14 @@ class ErrorMessageManager {
         'ギャラリーの使用が許可されていません。\nアプリの設定でギャラリーの利用を許可してください。',
     AppErrorCode.mapUnknownError().errorCode:
         'お店の情報の取得に失敗しました。\nしばらくしてから再度お試しください。',
+    AppErrorCode.commonAuthenticationError().errorCode://強制ログアウト
+        '認証エラーが発生しました。\n再度ログインしてください。',
+    AppErrorCode.commonPermissionDenied().errorCode:
+        'アクセスが拒否されました。\nしばらくしてから再度お試しください。',
+    AppErrorCode.commonNotFound().errorCode:
+        'ページが見つかりませんでした。\nしばらくしてから再度お試しください。',
+    AppErrorCode.commonServiceUnavailable().errorCode:
+        'サービスが一時的に利用できません。\nしばらくしてから再度お試しください。',//強制ログアウト
   };
 
   /// エラーコードに対応するメッセージを取得

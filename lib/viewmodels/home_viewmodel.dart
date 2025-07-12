@@ -8,6 +8,8 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../errors/app_error_code.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+import '../repositories/result.dart';
+
 part 'home_viewmodel.g.dart';
 
 @riverpod
@@ -23,11 +25,10 @@ class HomeViewModel extends _$HomeViewModel {
   }
   /// モデルのロード
   Future<void> loadModel() async {
-    try {
-      await _tfliteService.loadModel();
-    } catch (e) {
-      log('Model loading failed: $e');
-      state = state.copyWith(error: AppErrorCode.tensorFlowLiteUnknownError());
+    final result = await _tfliteService.loadModel(); // Result型を受け取る
+    if (result is Failure<void, AppErrorCode>) {
+      log('Model loading failed: ${result.exception}');
+      state = state.copyWith(error: result.exception);
     }
   }
 
@@ -51,38 +52,49 @@ class HomeViewModel extends _$HomeViewModel {
 
   /// ギャラリーから画像を選択
   Future<void> pickImageFromGallery() async {
-    try {
-      final imageFile = await _imagePickerService.pickImageFromGallery();
-      if (imageFile != null) {
-        state = state.copyWith(imageFile: imageFile);
-        await classifyImage(imageFile);
+    final result = await _imagePickerService.pickImageFromGallery(); // Result型を受け取る
+    if (result is Success<File?, AppErrorCode>) {
+      if (result.value != null) {
+        state = state.copyWith(imageFile: result.value);
+        await classifyImage(result.value);
       }
-    } catch (e) {
-      state = state.copyWith(error: e as AppErrorCode);
+    } else if (result is Failure<File?, AppErrorCode>) {
+      state = state.copyWith(error: result.exception);
+    } else {
+      state = state.copyWith(error: AppErrorCode.commonSystemError());
     }
   }
 
   /// カメラで画像を撮影
   Future<void> pickImageFromCamera() async {
-    try {
-      final imageFile = await _imagePickerService.pickImageFromCamera();
-      if (imageFile != null) {
-        state = state.copyWith(imageFile: imageFile);
-        await classifyImage(imageFile);
+    final result = await _imagePickerService.pickImageFromCamera(); // Result型を受け取る
+    if (result is Success<File?, AppErrorCode>) {
+      if (result.value != null) {
+        state = state.copyWith(imageFile: result.value);
+        await classifyImage(result.value);
       }
-    } catch (e) {
-      state = state.copyWith(error: e as AppErrorCode);
+    } else if (result is Failure<File?, AppErrorCode>) {
+      state = state.copyWith(error: result.exception);
+    } else {
+      state = state.copyWith(error: AppErrorCode.commonSystemError());
     }
   }
 
   /// 画像分類を実行
-  Future<void> classifyImage(File imageFile) async {
-    try {
-      state = state.copyWith(isLoading: true);
-      final result = await _tfliteService.classifyImage(imageFile);
-      state = state.copyWith(result: result, isLoading: false);
-    } catch (e) {
-      state = state.copyWith(error: e as AppErrorCode, isLoading: false);
+  Future<void> classifyImage(File? imageFile) async {
+    state = state.copyWith(isLoading: true);
+    if (imageFile == null) {
+      state = state.copyWith(error: AppErrorCode.imageUnknownError(), isLoading: false);
+      return;
+    }
+    final result = await _tfliteService.classifyImage(imageFile); // Result型を受け取る
+
+    if (result is Success<String, AppErrorCode>) {
+      state = state.copyWith(result: result.value, isLoading: false);
+    } else if (result is Failure<String, AppErrorCode>) {
+      state = state.copyWith(error: result.exception, isLoading: false);
+    } else {
+      state = state.copyWith(error: AppErrorCode.commonSystemError(), isLoading: false);
     }
   }
   /// カメラ権限リクエスト
@@ -113,6 +125,3 @@ class HomeViewModel extends _$HomeViewModel {
     state = state.initialize();
   }
 }
-
-
-
