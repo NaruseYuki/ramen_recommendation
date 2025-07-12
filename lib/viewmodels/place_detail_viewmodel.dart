@@ -5,7 +5,9 @@ import 'package:ramen_recommendation/services/database_service.dart';
 import 'package:ramen_recommendation/models/ramen_state.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:ramen_recommendation/api/providers/service_providers.dart';
+import '../api/responses/get_place_details_response.dart';
 import '../errors/app_error_code.dart';
+import '../repositories/result.dart';
 
 part 'place_detail_viewmodel.g.dart';
 
@@ -60,33 +62,39 @@ class PlaceDetailViewModel extends _$PlaceDetailViewModel {
 
   Future<void> fetchPlaceDetails(String placeId) async {
     state = state.copyWith(isLoading: true);
-    try {
-      final response = await _placesRepository.getPlaceDetails(
-        request: GetPlaceDetailsRequest(placeId: placeId),
-      );
+    final result = await _placesRepository.getPlaceDetails(
+      request: GetPlaceDetailsRequest(placeId: placeId),
+    );
+
+    if (result is Success<GetPlaceDetailsResponse, AppErrorCode>) {
       state = state.copyWith(
         isLoading: false,
-        detail: {placeId: response},
+        detail: {placeId: result.value},
       );
-    } catch (e) {
+    } else if (result is Failure<GetPlaceDetailsResponse, AppErrorCode>) {
       state = state.copyWith(
-          error: e as AppErrorCode, isLoading: false);
+          error: result.exception, isLoading: false);
+    } else {
+      state = state.copyWith(error: AppErrorCode.commonSystemError(), isLoading: false);
     }
   }
 
   Future<void> fetchPlaceDetailsWithoutLoading(String placeId) async {
-    try {
-      final response = await _placesRepository.getPlaceDetails(
-        request: GetPlaceDetailsRequest(placeId: placeId),
-      );
+    final result = await _placesRepository.getPlaceDetails(
+      request: GetPlaceDetailsRequest(placeId: placeId),
+    );
+
+    if (result is Success<GetPlaceDetailsResponse, AppErrorCode>) {
       state = state.copyWith(
         detail: {
-          placeId: response
+          placeId: result.value
         },
       );
-    } catch (e) {
+    } else if (result is Failure<GetPlaceDetailsResponse, AppErrorCode>) {
       state = state.copyWith(
-          error: e as AppErrorCode);
+          error: result.exception);
+    } else {
+      state = state.copyWith(error: AppErrorCode.commonSystemError());
     }
   }
 

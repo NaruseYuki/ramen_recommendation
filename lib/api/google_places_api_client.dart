@@ -1,4 +1,4 @@
-import 'package:dio/dio.dart' hide Headers;
+import 'package:dio/dio.dart';
 import 'package:retrofit/retrofit.dart';
 import 'package:ramen_recommendation/api/responses/get_place_details_response.dart';
 import 'package:ramen_recommendation/api/responses/search_ramen_places_response.dart';
