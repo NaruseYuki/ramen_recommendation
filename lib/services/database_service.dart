@@ -1,6 +1,8 @@
+import 'package:ramen_recommendation/errors/app_error_code.dart';
 import 'package:ramen_recommendation/models/ramen_place.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
+import '../repositories/result.dart';
 
 class DatabaseService {
   static final DatabaseService _instance = DatabaseService._internal();
@@ -37,55 +39,56 @@ class DatabaseService {
     );
   }
 
-  Future<bool> addFavorite(RamenPlace place) async {
+  Future<Result<bool, AppErrorCode>> addFavorite(RamenPlace place) async {
     try {
       final db = await database;
-      // RamenPlaceオブジェクトをデータベースのフラットなカラム構造にマッピング
       await db.insert(
         'favorites',
         {
           'id': place.id,
-          'display_name': place.displayName.text, // DisplayNameからtextを取り出す
+          'display_name': place.displayName.text,
           'address': place.address,
-          'latitude': place.location.latitude, // Locationからlatitudeを取り出す
-          'longitude': place.location.longitude, // Locationからlongitudeを取り出す
+          'latitude': place.location.latitude,
+          'longitude': place.location.longitude,
         },
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
-      return true;
+      return const Success(true);
     } catch (e) {
-      throw Exception('Failed to add favorite: $e');
-      return false;
+      return Failure(AppErrorCode.databaseUnknownError());
     }
   }
 
-  Future<bool> removeFavorite(String id) async {
+  Future<Result<bool, AppErrorCode>> removeFavorite(String id) async {
     try {
       final db = await database;
       final count =
-          await db.delete('favorites', where: 'id = ?', whereArgs: [id]);
-      return count > 0;
+      await db.delete('favorites', where: 'id = ?', whereArgs: [id]);
+      return Success(count > 0);
     } catch (e) {
-      return false;
+      return Failure(AppErrorCode.databaseUnknownError());
     }
   }
 
   /// お気に入りを取得し、`RamenPlace` のリストを返却
-  Future<List<RamenPlace>> getFavorites() async {
-    final db = await database;
-    final List<Map<String, dynamic>> maps = await db.query('favorites');
+  Future<Result<List<RamenPlace>, AppErrorCode>> getFavorites() async {
+    try {
+      final db = await database;
+      final List<Map<String, dynamic>> maps = await db.query('favorites');
 
-    // Map を RamenPlace に変換してリストとして返却
-    return List.generate(maps.length, (i) {
-      return RamenPlace(
-        id: maps[i]['id'] as String,
-        displayName: DisplayName(text: maps[i]['display_name']),
-        address: maps[i]['address'],
-        location: Location(
-          latitude: maps[i]['latitude'] as double,
-          longitude: maps[i]['longitude'] as double,
-        )
-      );
-    });
+      return Success(List.generate(maps.length, (i) {
+        return RamenPlace(
+            id: maps[i]['id'] as String,
+            displayName: DisplayName(text: maps[i]['display_name']),
+            address: maps[i]['address'],
+            location: Location(
+              latitude: maps[i]['latitude'] as double,
+              longitude: maps[i]['longitude'] as double,
+            )
+        );
+      }));
+    } catch (e) {
+      return Failure(AppErrorCode.databaseUnknownError());
+    }
   }
 }
