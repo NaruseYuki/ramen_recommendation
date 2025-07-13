@@ -8,10 +8,9 @@ abstract class ErrorListeningScreen<T extends ConsumerStatefulWidget> extends Co
   @override
   Widget build(BuildContext context) {
     // build メソッド内で ref.listen を使用することで、
-    ref.listen<AppErrorCode?>(errorMessageProvider, (prev, next) {
-      if (next != null) { // ウィジェットがマウントされていることを確認する必要は、build内のリスナーでは必須ではありませんが、付けても問題ありません
-        showError(next.toString()); // AppErrorCodeのtoString()メソッドを呼び出す
-        // エラー表示後にプロバイダーの値をクリア
+    ref.listen<AppErrorCode?>(errorMessageProvider, (prev, next) async {
+      if (next != null) {
+        await showError(next.toString());
         ref.read(errorMessageProvider.notifier).state = null;
       }
     });
@@ -21,7 +20,7 @@ abstract class ErrorListeningScreen<T extends ConsumerStatefulWidget> extends Co
   }
 
   Future<void> showError(String message) async {
-    await showDialog( // await を追加
+    await showDialog(
       context: context,
       builder: (_) => AlertDialog(
         title: const Text('エラー'),
