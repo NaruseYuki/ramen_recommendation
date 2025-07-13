@@ -4,8 +4,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ramen_recommendation/models/ramen_place.dart';
 import 'package:ramen_recommendation/models/review.dart';
 import 'package:ramen_recommendation/viewmodels/place_detail_viewmodel.dart';
+import 'package:ramen_recommendation/views/screens/base/error_listening_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:easy_localization/easy_localization.dart';
+
+import '../../api/providers/service_providers.dart';
+import '../../errors/app_error_code.dart';
 
 class PlaceDetailScreen extends ConsumerStatefulWidget {
   final String placeId;
@@ -15,11 +19,12 @@ class PlaceDetailScreen extends ConsumerStatefulWidget {
   ConsumerState<PlaceDetailScreen> createState() => _PlaceDetailScreenState();
 }
 
-class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
+// ErrorListeningPageを継承
+class _PlaceDetailScreenState extends ErrorListeningScreen<PlaceDetailScreen> {
   late PlaceDetailViewModel placeDetailViewmodel;
   @override
   void initState() {
-    super.initState();
+    super.initState(); // ErrorListeningPageのinitStateを呼び出す
     WidgetsBinding.instance.addPostFrameCallback((_) {
       placeDetailViewmodel = ref.read(placeDetailViewModelProvider.notifier);
       placeDetailViewmodel.fetchInitialData(widget.placeId);
@@ -37,8 +42,8 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
       );
     }
 
-    // 店舗情報取得失敗
-    if (state.detail.isEmpty || !state.detail.containsKey(widget.placeId)) {
+    // 店舗情報取得失敗のチェックは残す（エラーではないため）
+    if (!state.detail.containsKey(widget.placeId)) {
       return Scaffold(
         appBar: AppBar(),
         body: Center(child: Text('place_detail.info_not_found'.tr())),
@@ -59,24 +64,24 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
             ),
             onPressed: () async {
               final result =
-                  await placeDetailViewmodel.toggleFavorite(RamenPlace(
+              await placeDetailViewmodel.toggleFavorite(RamenPlace(
                 id: detail.id,
                 displayName: DisplayName(text: detail.name),
                 address: detail.address,
                 location: Location(
                     latitude: detail.latitude, longitude: detail.longitude),
               ));
-              scaffoldMessenger.showSnackBar(
-                SnackBar(
-                  content: Text(
-                    result
-                        ? (isFavorite
-                            ? 'favorite.remove_success'.tr()
-                            : 'favorite.add_success'.tr())
-                        : 'favorite.update_failed'.tr(),
+              if (result) { // UI更新が成功した場合のみSnack barを表示
+                scaffoldMessenger.showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      isFavorite
+                          ? 'favorite.remove_success'.tr()
+                          : 'favorite.add_success'.tr(),
+                    ),
                   ),
-                ),
-              );
+                );
+              }
             },
           ),
         ],
@@ -129,6 +134,7 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
           width: double.infinity,
           child: ElevatedButton(
             onPressed: () {
+              // _launchMapでエラーが発生した場合もerrorMessageProviderに設定される
               _launchMap(details.name);
             },
             child: Text('place_detail.open_map'.tr()),
@@ -240,22 +246,23 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
     );
   }
 
+  // launchUrlエラーハンドリングの追加 (errorMessageProviderに設定)
   Future<void> _launchMap(String name) async {
-    final url = Uri.parse(
-        'https://www.google.com/maps?q=$name');
+    final url = Uri.parse('https://www.google.com/maps?q=$name');
     if (await canLaunchUrl(url)) {
       await launchUrl(url);
     } else {
-      throw 'place_detail.map_open_failed'.tr();
+      ref.read(errorMessageProvider.notifier).state = AppErrorCode.mapUnknownError(); // エラーをerrorMessageProviderに設定
     }
   }
 
+  // launchUrlエラーハンドリングの追加 (errorMessageProviderに設定)
   Future<void> _launchWebsite(String websiteUri) async {
     final url = Uri.parse(websiteUri);
     if (await canLaunchUrl(url)) {
       await launchUrl(url);
     } else {
-      throw 'place_detail.website_open_failed'.tr();
+      ref.read(errorMessageProvider.notifier).state = AppErrorCode.commonSystemError(); // ウェブサイトオープン失敗を一般的なシステムエラーとする
     }
   }
 }

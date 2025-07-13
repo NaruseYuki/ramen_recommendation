@@ -2,27 +2,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ramen_recommendation/api/providers/service_providers.dart';
-
-import '../../../errors/app_error_code.dart'; // errorMessageProviderをインポート
-
+import 'package:ramen_recommendation/errors/app_error_code.dart';
 abstract class ErrorListeningScreen<T extends ConsumerStatefulWidget> extends ConsumerState<T> {
-  @override
-  void initState() {
-    super.initState();
 
-    // 共通のエラー状態の購読
+  @override
+  Widget build(BuildContext context) {
+    // build メソッド内で ref.listen を使用することで、
     ref.listen<AppErrorCode?>(errorMessageProvider, (prev, next) {
-      if (next != null) {
-        showError('${next.errorCode}\n${next.message}');;
+      if (next != null) { // ウィジェットがマウントされていることを確認する必要は、build内のリスナーでは必須ではありませんが、付けても問題ありません
+        showError(next.toString()); // AppErrorCodeのtoString()メソッドを呼び出す
         // エラー表示後にプロバイダーの値をクリア
         ref.read(errorMessageProvider.notifier).state = null;
       }
     });
+
+    // この基底クラス自体はUIを表示しないため、空のウィジェットを返します。
+    return const SizedBox.shrink();
   }
 
-  // エラー表示の具体的な実装（SnackBarまたはDialog）
-  void showError(String message) {
-    showDialog(
+  Future<void> showError(String message) async {
+    await showDialog( // await を追加
       context: context,
       builder: (_) => AlertDialog(
         title: const Text('エラー'),
