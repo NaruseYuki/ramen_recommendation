@@ -37,17 +37,8 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
       );
     }
 
-    // エラー
-    if (state.error != null) {
-      return Scaffold(
-        appBar: AppBar(),
-        body: Center(
-            child: Text('home.error'.tr(args: [state.error.toString()]))),
-      );
-    }
-
     // 店舗情報取得失敗
-    if (!state.detail.containsKey(widget.placeId)) {
+    if (state.detail.isEmpty || !state.detail.containsKey(widget.placeId)) {
       return Scaffold(
         appBar: AppBar(),
         body: Center(child: Text('place_detail.info_not_found'.tr())),

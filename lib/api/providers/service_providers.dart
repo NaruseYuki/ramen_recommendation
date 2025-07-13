@@ -7,6 +7,7 @@ import 'package:ramen_recommendation/services/tflite_service.dart';
 import 'package:ramen_recommendation/services/image_picker_service.dart';
 import 'package:ramen_recommendation/services/database_service.dart';
 
+import '../../errors/app_error_code.dart';
 import '../google_places_api_client.dart';
 import '../intercepter/custom_interceptor.dart';
 
@@ -27,3 +28,5 @@ PlacesRepositoryInterface placeDetailsRepository(Ref ref) {
   dio.interceptors.add(CustomInterceptor());//共通のエラーハンドリング
   return PlacesRepository(GooglePlacesApiClient(dio));
 }
+
+final errorMessageProvider = StateProvider<AppErrorCode?>((ref) => null);

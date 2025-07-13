@@ -98,11 +98,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
       ElevatedButton(
         onPressed: () async {
           await homeViewModel.pickImageFromGalleryWithPermission();
-          if (state.error != null) {
-            scaffoldManager.showSnackBar(
-              SnackBar(content: Text(state.error.toString())),
-            );
-          }
         },
         child: Text('home.gallery_select'.tr()),
       ),
