@@ -1,8 +1,10 @@
+// lib/views/screens/home_screen.dart
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ramen_recommendation/models/ramen_state.dart';
 import 'package:ramen_recommendation/viewmodels/home_viewmodel.dart';
+import 'package:ramen_recommendation/views/screens/base/error_listening_screen.dart';
 import 'package:ramen_recommendation/views/screens/favorite_places_screen.dart';
 import 'package:ramen_recommendation/views/screens/search_results_screen.dart';
 
@@ -10,15 +12,17 @@ class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
+  // ErrorListeningPageを継承するように変更
   ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObserver {
+// ErrorListeningPageを継承
+class _HomeScreenState extends ErrorListeningScreen<HomeScreen> with WidgetsBindingObserver {
   late HomeViewModel homeViewModel;
 
   @override
   void initState() {
-    super.initState();
+    super.initState(); // ErrorListeningPageのinitState()を忘れずに呼び出します
     WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       homeViewModel = ref.read(homeViewModelProvider.notifier);
@@ -66,11 +70,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
         child: homeState.isLoading
             ? const CircularProgressIndicator()
             : SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: _buildContent(context, homeState),
-                ),
-              ),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: _buildContent(context, homeState),
+          ),
+        ),
       ),
       bottomNavigationBar: homeState.isLoading
           ? const SizedBox.shrink()
@@ -79,7 +83,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
   }
 
   Widget _buildContent(BuildContext context, RamenState state) {
-    final scaffoldManager = ScaffoldMessenger.of(context);
     List<Widget> children = [];
 
     if (state.imageFile == null) {
@@ -98,17 +101,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
       ElevatedButton(
         onPressed: () async {
           await homeViewModel.pickImageFromGalleryWithPermission();
-          if (state.error != null) {
-            scaffoldManager.showSnackBar(
-              SnackBar(content: Text(state.error.toString())),
-            );
-          }
+          // エラーはErrorListeningPageで自動的に処理されるため、ここでのSnackBar呼び出しは不要
         },
         child: Text('home.gallery_select'.tr()),
       ),
       ElevatedButton(
         onPressed: () async {
           await homeViewModel.pickImageFromCameraWithPermission();
+          // エラーはErrorListeningPageで自動的に処理されるため、ここでのSnackBar呼び出しは不要
         },
         child: Text('home.camera_capture'.tr()),
       ),
@@ -135,11 +135,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
         onPressed: isSearchDisabled
             ? null
             : () {
-                final route = MaterialPageRoute(
-                  builder: (context) => SearchResultsScreen(ramenType: keyword),
-                );
-                Navigator.push(context, route);
-              },
+          final route = MaterialPageRoute(
+            builder: (context) => SearchResultsScreen(ramenType: keyword),
+          );
+          Navigator.push(context, route);
+        },
         child: Text(
           isSearchDisabled
               ? 'home.search_disabled'.tr()

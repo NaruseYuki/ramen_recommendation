@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ramen_recommendation/models/ramen_place.dart';
 import 'package:ramen_recommendation/viewmodels/favorite_places_viewmodel.dart';
+import 'package:ramen_recommendation/views/screens/base/error_listening_screen.dart';
 import 'package:ramen_recommendation/views/screens/place_detail_screen.dart';
 import 'package:easy_localization/easy_localization.dart';
 
@@ -14,13 +15,13 @@ class FavoritePlacesScreen extends ConsumerStatefulWidget {
       _FavoritePlacesScreenState();
 }
 
-class _FavoritePlacesScreenState extends ConsumerState<FavoritePlacesScreen> {
+// ErrorListeningPageを継承
+class _FavoritePlacesScreenState extends ErrorListeningScreen<FavoritePlacesScreen> {
   late FavoritePlacesViewModel favoritePlacesViewModel;
 
   @override
   void initState() {
-    super.initState();
-    // 初回のみ呼び出す
+    super.initState(); // ErrorListeningPageのinitStateを呼び出す
     WidgetsBinding.instance.addPostFrameCallback((_) {
       favoritePlacesViewModel =
           ref.read(favoritePlacesViewModelProvider.notifier);
@@ -40,48 +41,49 @@ class _FavoritePlacesScreenState extends ConsumerState<FavoritePlacesScreen> {
       body: state.isLoading
           ? const Center(child: CircularProgressIndicator())
           : state.places.isEmpty
-              ? Center(child: Text('favorite.empty'.tr()))
-              : ListView.builder(
-                  itemCount: state.places.length,
-                  itemBuilder: (context, index) {
-                    final place = state.places[index] as RamenPlace;
-                    final isFavorite =
-                        state.favoritePlaceIds.contains(place.id);
-                    return ListTile(
-                      title: Text(place.displayName.text),
-                      subtitle: Text(place.address ),
-                      trailing: IconButton(
-                        icon: Icon(
-                          isFavorite ? Icons.star : Icons.star_border,
-                          color: isFavorite ? Colors.amber : null,
-                        ),
-                        onPressed: () async {
-                          final result = await favoritePlacesViewModel.toggleFavorite(place);
-                          scaffoldMessenger.showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                result
-                                    ? (isFavorite
-                                    ? 'favorite.remove_success'.tr()
-                                    : 'favorite.add_success'.tr())
-                                    : 'favorite.update_failed'.tr(),
-                              ),
-                            ),
-                          );
-                        }
-                      ),
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                PlaceDetailScreen(placeId: place.id),
-                          ),
-                        );
-                      },
-                    );
-                  },
+          ? Center(child: Text('favorite.empty'.tr()))
+          : ListView.builder(
+        itemCount: state.places.length,
+        itemBuilder: (context, index) {
+          final place = state.places[index] as RamenPlace;
+          final isFavorite =
+          state.favoritePlaceIds.contains(place.id);
+          return ListTile(
+            title: Text(place.displayName.text),
+            subtitle: Text(place.address ),
+            trailing: IconButton(
+                icon: Icon(
+                  isFavorite ? Icons.star : Icons.star_border,
+                  color: isFavorite ? Colors.amber : null,
                 ),
+                onPressed: () async {
+                  // ViewModelでエラーがerrorMessageProviderに設定されるため、ここでは結果のboolean値のみを確認
+                  final result = await favoritePlacesViewModel.toggleFavorite(place);
+                  if (result) { 
+                    scaffoldMessenger.showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          isFavorite
+                              ? 'favorite.remove_success'.tr()
+                              : 'favorite.add_success'.tr(),
+                        ),
+                      ),
+                    );
+                  }
+                }
+            ),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      PlaceDetailScreen(placeId: place.id),
+                ),
+              );
+            },
+          );
+        },
+      ),
     );
   }
 }

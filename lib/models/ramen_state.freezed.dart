@@ -18,7 +18,6 @@ mixin _$RamenState<T> {
   File? get imageFile;
   String? get result;
   bool get isLoading; // デフォルト値: false
-  AppErrorCode? get error;
   List<T> get places; // デフォルト値: 空のリスト
   Set<String> get favoritePlaceIds; // デフォルト値: 空のセット
   Map<String, GetPlaceDetailsResponse> get detail;
@@ -41,7 +40,6 @@ mixin _$RamenState<T> {
             (identical(other.result, result) || other.result == result) &&
             (identical(other.isLoading, isLoading) ||
                 other.isLoading == isLoading) &&
-            (identical(other.error, error) || other.error == error) &&
             const DeepCollectionEquality().equals(other.places, places) &&
             const DeepCollectionEquality()
                 .equals(other.favoritePlaceIds, favoritePlaceIds) &&
@@ -54,14 +52,13 @@ mixin _$RamenState<T> {
       imageFile,
       result,
       isLoading,
-      error,
       const DeepCollectionEquality().hash(places),
       const DeepCollectionEquality().hash(favoritePlaceIds),
       const DeepCollectionEquality().hash(detail));
 
   @override
   String toString() {
-    return 'RamenState<$T>(imageFile: $imageFile, result: $result, isLoading: $isLoading, error: $error, places: $places, favoritePlaceIds: $favoritePlaceIds, detail: $detail)';
+    return 'RamenState<$T>(imageFile: $imageFile, result: $result, isLoading: $isLoading, places: $places, favoritePlaceIds: $favoritePlaceIds, detail: $detail)';
   }
 }
 
@@ -75,7 +72,6 @@ abstract mixin class $RamenStateCopyWith<T, $Res> {
       {File? imageFile,
       String? result,
       bool isLoading,
-      AppErrorCode? error,
       List<T> places,
       Set<String> favoritePlaceIds,
       Map<String, GetPlaceDetailsResponse> detail});
@@ -97,7 +93,6 @@ class _$RamenStateCopyWithImpl<T, $Res>
     Object? imageFile = freezed,
     Object? result = freezed,
     Object? isLoading = null,
-    Object? error = freezed,
     Object? places = null,
     Object? favoritePlaceIds = null,
     Object? detail = null,
@@ -115,10 +110,6 @@ class _$RamenStateCopyWithImpl<T, $Res>
           ? _self.isLoading
           : isLoading // ignore: cast_nullable_to_non_nullable
               as bool,
-      error: freezed == error
-          ? _self.error
-          : error // ignore: cast_nullable_to_non_nullable
-              as AppErrorCode?,
       places: null == places
           ? _self.places
           : places // ignore: cast_nullable_to_non_nullable
@@ -142,7 +133,6 @@ class _RamenState<T> extends RamenState<T> {
       {this.imageFile,
       this.result,
       this.isLoading = false,
-      this.error,
       final List<T> places = const [],
       final Set<String> favoritePlaceIds = const {},
       final Map<String, GetPlaceDetailsResponse> detail = const {}})
@@ -159,9 +149,8 @@ class _RamenState<T> extends RamenState<T> {
   @JsonKey()
   final bool isLoading;
 // デフォルト値: false
-  @override
-  final AppErrorCode? error;
   final List<T> _places;
+// デフォルト値: false
   @override
   @JsonKey()
   List<T> get places {
@@ -210,7 +199,6 @@ class _RamenState<T> extends RamenState<T> {
             (identical(other.result, result) || other.result == result) &&
             (identical(other.isLoading, isLoading) ||
                 other.isLoading == isLoading) &&
-            (identical(other.error, error) || other.error == error) &&
             const DeepCollectionEquality().equals(other._places, _places) &&
             const DeepCollectionEquality()
                 .equals(other._favoritePlaceIds, _favoritePlaceIds) &&
@@ -223,14 +211,13 @@ class _RamenState<T> extends RamenState<T> {
       imageFile,
       result,
       isLoading,
-      error,
       const DeepCollectionEquality().hash(_places),
       const DeepCollectionEquality().hash(_favoritePlaceIds),
       const DeepCollectionEquality().hash(_detail));
 
   @override
   String toString() {
-    return 'RamenState<$T>(imageFile: $imageFile, result: $result, isLoading: $isLoading, error: $error, places: $places, favoritePlaceIds: $favoritePlaceIds, detail: $detail)';
+    return 'RamenState<$T>(imageFile: $imageFile, result: $result, isLoading: $isLoading, places: $places, favoritePlaceIds: $favoritePlaceIds, detail: $detail)';
   }
 }
 
@@ -246,7 +233,6 @@ abstract mixin class _$RamenStateCopyWith<T, $Res>
       {File? imageFile,
       String? result,
       bool isLoading,
-      AppErrorCode? error,
       List<T> places,
       Set<String> favoritePlaceIds,
       Map<String, GetPlaceDetailsResponse> detail});
@@ -268,7 +254,6 @@ class __$RamenStateCopyWithImpl<T, $Res>
     Object? imageFile = freezed,
     Object? result = freezed,
     Object? isLoading = null,
-    Object? error = freezed,
     Object? places = null,
     Object? favoritePlaceIds = null,
     Object? detail = null,
@@ -286,10 +271,6 @@ class __$RamenStateCopyWithImpl<T, $Res>
           ? _self.isLoading
           : isLoading // ignore: cast_nullable_to_non_nullable
               as bool,
-      error: freezed == error
-          ? _self.error
-          : error // ignore: cast_nullable_to_non_nullable
-              as AppErrorCode?,
       places: null == places
           ? _self._places
           : places // ignore: cast_nullable_to_non_nullable
