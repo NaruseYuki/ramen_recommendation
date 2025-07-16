@@ -48,12 +48,16 @@ class _SearchResultsScreenState extends ErrorListeningScreen<SearchResultsScreen
             title: Text(place.displayName.text),
             subtitle: Text(place.address),
             onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) =>
-                      PlaceDetailScreen(placeId: place.id),
-                ),
+              showModalBottomSheet(
+                context: context,
+                isScrollControlled: true, // 全画面のボトムシートにする場合
+                useSafeArea: true, // セーフエリアを考慮する場合
+                builder: (BuildContext context) {
+                  return SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.9,
+                    child: PlaceDetailScreen(placeId: place.id),
+                  );
+                },
               );
             },
           );
