@@ -59,7 +59,7 @@ class _FavoritePlacesScreenState extends ErrorListeningScreen<FavoritePlacesScre
                 onPressed: () async {
                   // ViewModelでエラーがerrorMessageProviderに設定されるため、ここでは結果のboolean値のみを確認
                   final result = await favoritePlacesViewModel.toggleFavorite(place);
-                  if (result) { 
+                  if (result) {
                     scaffoldMessenger.showSnackBar(
                       SnackBar(
                         content: Text(
@@ -73,12 +73,18 @@ class _FavoritePlacesScreenState extends ErrorListeningScreen<FavoritePlacesScre
                 }
             ),
             onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) =>
-                      PlaceDetailScreen(placeId: place.id),
-                ),
+              showModalBottomSheet(
+                context: context,
+                backgroundColor: Colors.green,
+                isScrollControlled: true, // 全画面のボトムシートにする場合
+                useSafeArea: true, // セーフエリアを考慮する場合
+                showDragHandle: true,
+                builder: (BuildContext context) {
+                  return SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.9,
+                    child: PlaceDetailScreen(placeId: place.id),
+                  );
+                },
               );
             },
           );

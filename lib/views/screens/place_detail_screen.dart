@@ -45,7 +45,7 @@ class _PlaceDetailScreenState extends ErrorListeningScreen<PlaceDetailScreen> {
     // 店舗情報取得失敗のチェックは残す（エラーではないため）
     if (!state.detail.containsKey(widget.placeId)) {
       return Scaffold(
-        appBar: AppBar(),
+        appBar: AppBar(), // ここは残しておくと、エラー時にAppbarが表示されます
         body: Center(child: Text('place_detail.info_not_found'.tr())),
       );
     }
@@ -54,30 +54,51 @@ class _PlaceDetailScreenState extends ErrorListeningScreen<PlaceDetailScreen> {
     final isFavorite = state.favoritePlaceIds.contains(detail.id);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(detail.name),
-        actions: [
-          IconButton(
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            // _buildPlaceDetailsにisFavoriteとscaffoldMessengerを渡す
+            children: _buildPlaceDetails(context, detail, isFavorite, scaffoldMessenger),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // isFavoriteとScaffoldMessengerStateを引数に追加
+  List<Widget> _buildPlaceDetails(BuildContext context, details, bool isFavorite, ScaffoldMessengerState scaffoldMessenger) {
+    List<Widget> list = [
+      Row( // 店名と星アイコンを横並びにするためにRowで囲む
+        children: [
+          Expanded( // 店名が利用可能なスペースを占めるようにする
+            child: Text(
+              details.name,
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+          ),
+          IconButton( // お気に入りアイコンをここに移動
             icon: Icon(
               isFavorite ? Icons.star : Icons.star_border,
-              color: isFavorite ? Colors.amber : Colors.white,
+              color: isFavorite ? Colors.amber : null, // お気に入り状態によって色を変える
             ),
             onPressed: () async {
               final result =
               await placeDetailViewmodel.toggleFavorite(RamenPlace(
-                id: detail.id,
-                displayName: DisplayName(text: detail.name),
-                address: detail.address,
+                id: details.id,
+                displayName: DisplayName(text: details.name),
+                address: details.address,
                 location: Location(
-                    latitude: detail.latitude, longitude: detail.longitude),
+                    latitude: details.latitude, longitude: details.longitude),
               ));
               if (result) { // UI更新が成功した場合のみSnack barを表示
                 scaffoldMessenger.showSnackBar(
                   SnackBar(
                     content: Text(
-                      isFavorite
-                          ? 'favorite.remove_success'.tr()
-                          : 'favorite.add_success'.tr(),
+                      isFavorite // ここはトグル後の状態ではなく、トグル前の状態をチェック
+                          ? 'favorite.remove_success'.tr() // お気に入りだったものが削除された場合
+                          : 'favorite.add_success'.tr(), // お気に入りではなかったものが追加された場合
                     ),
                   ),
                 );
@@ -85,24 +106,6 @@ class _PlaceDetailScreenState extends ErrorListeningScreen<PlaceDetailScreen> {
             },
           ),
         ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: _buildPlaceDetails(context, detail),
-          ),
-        ),
-      ),
-    );
-  }
-
-  List<Widget> _buildPlaceDetails(BuildContext context, details) {
-    List<Widget> list = [
-      Text(
-        details.name,
-        style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
       ),
       const SizedBox(height: 8),
       Text(
@@ -134,7 +137,6 @@ class _PlaceDetailScreenState extends ErrorListeningScreen<PlaceDetailScreen> {
           width: double.infinity,
           child: ElevatedButton(
             onPressed: () {
-              // _launchMapでエラーが発生した場合もerrorMessageProviderに設定される
               _launchMap(details.name);
             },
             child: Text('place_detail.open_map'.tr()),
