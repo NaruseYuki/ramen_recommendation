@@ -8,6 +8,8 @@ import 'package:ramen_recommendation/views/screens/base/error_listening_screen.d
 import 'package:ramen_recommendation/views/screens/favorite_places_screen.dart';
 import 'package:ramen_recommendation/views/screens/search_results_screen.dart';
 
+import 'menu/menu.dart';
+
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
@@ -66,6 +68,7 @@ class _HomeScreenState extends ErrorListeningScreen<HomeScreen> with WidgetsBind
           ),
         ],
       ),
+      drawer: const AppDrawer(),
       body: Center(
         child: homeState.isLoading
             ? const CircularProgressIndicator()
@@ -86,7 +89,7 @@ class _HomeScreenState extends ErrorListeningScreen<HomeScreen> with WidgetsBind
     List<Widget> children = [];
 
     if (state.imageFile == null) {
-      children.add(const Text('画像を選択してください'));
+      children.add( Text('home.select_image'.tr()));
     } else {
       children.add(
         Image.file(
@@ -108,7 +111,6 @@ class _HomeScreenState extends ErrorListeningScreen<HomeScreen> with WidgetsBind
       ElevatedButton(
         onPressed: () async {
           await homeViewModel.pickImageFromCameraWithPermission();
-          // エラーはErrorListeningPageで自動的に処理されるため、ここでのSnackBar呼び出しは不要
         },
         child: Text('home.camera_capture'.tr()),
       ),

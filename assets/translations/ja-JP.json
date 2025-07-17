@@ -7,7 +7,8 @@
     "search_nearby": "付近のラーメンを検索",
     "search_disabled": "検索できません",
     "analysis_result": "分析結果: {}",
-    "error": "エラー: {}"
+    "error": "エラー: {}",
+    "select_image": "画像を選択してください"
   },
   "favorite": {
     "title": "お気に入り店舗",
@@ -47,5 +48,11 @@
     "tensorflow_load_failed": "AIモデルのロードに失敗しました。",
     "search_failed": "検索に失敗しました",
     "detail_failed": "詳細情報の取得に失敗しました"
+  },
+  "menu": {
+    "top": "トップ",
+    "favorite": "お気に入り店舗",
+    "archive": "検索履歴\n（Coming Soon）",
+    "license": "ライセンス情報"
   }
 }
