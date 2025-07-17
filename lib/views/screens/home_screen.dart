@@ -14,17 +14,15 @@ class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  // ErrorListeningPageを継承するように変更
   ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-// ErrorListeningPageを継承
 class _HomeScreenState extends ErrorListeningScreen<HomeScreen> with WidgetsBindingObserver {
   late HomeViewModel homeViewModel;
 
   @override
   void initState() {
-    super.initState(); // ErrorListeningPageのinitState()を忘れずに呼び出します
+    super.initState();
     WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       homeViewModel = ref.read(homeViewModelProvider.notifier);
@@ -41,7 +39,6 @@ class _HomeScreenState extends ErrorListeningScreen<HomeScreen> with WidgetsBind
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.paused) {
-      // onResume時にRamenStateを初期化
       ref.read(homeViewModelProvider.notifier).stateClear();
     }
     super.didChangeAppLifecycleState(state);
@@ -104,7 +101,6 @@ class _HomeScreenState extends ErrorListeningScreen<HomeScreen> with WidgetsBind
       ElevatedButton(
         onPressed: () async {
           await homeViewModel.pickImageFromGalleryWithPermission();
-          // エラーはErrorListeningPageで自動的に処理されるため、ここでのSnackBar呼び出しは不要
         },
         child: Text('home.gallery_select'.tr()),
       ),

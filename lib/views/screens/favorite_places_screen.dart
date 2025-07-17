@@ -75,7 +75,7 @@ class _FavoritePlacesScreenState extends ErrorListeningScreen<FavoritePlacesScre
             onTap: () {
               showModalBottomSheet(
                 context: context,
-                backgroundColor: Colors.green,
+                backgroundColor: Colors.green, // ボトムシートの背景色を設定
                 isScrollControlled: true, // 全画面のボトムシートにする場合
                 useSafeArea: true, // セーフエリアを考慮する場合
                 showDragHandle: true,

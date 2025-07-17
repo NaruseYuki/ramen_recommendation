@@ -50,8 +50,10 @@ class _SearchResultsScreenState extends ErrorListeningScreen<SearchResultsScreen
             onTap: () {
               showModalBottomSheet(
                 context: context,
+                backgroundColor: Colors.green,
                 isScrollControlled: true, // 全画面のボトムシートにする場合
                 useSafeArea: true, // セーフエリアを考慮する場合
+                showDragHandle: true,
                 builder: (BuildContext context) {
                   return SizedBox(
                     height: MediaQuery.of(context).size.height * 0.9,
