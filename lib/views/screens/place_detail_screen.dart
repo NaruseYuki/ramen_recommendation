@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ramen_recommendation/models/ramen_place.dart';
 import 'package:ramen_recommendation/models/review.dart';
+import 'package:ramen_recommendation/utils/color.dart';
 import 'package:ramen_recommendation/viewmodels/place_detail_viewmodel.dart';
 import 'package:ramen_recommendation/views/screens/base/error_listening_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -42,28 +43,23 @@ class _PlaceDetailScreenState extends ErrorListeningScreen<PlaceDetailScreen> {
       );
     }
 
-    // 店舗情報取得失敗のチェックは残す（エラーではないため）
-    if (!state.detail.containsKey(widget.placeId)) {
-      return Scaffold(
-        appBar: AppBar(), // ここは残しておくと、エラー時にAppbarが表示されます
-        body: Center(child: Text('place_detail.info_not_found'.tr())),
-      );
-    }
-
     final detail = state.detail[widget.placeId]!;
     final isFavorite = state.favoritePlaceIds.contains(detail.id);
 
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            // _buildPlaceDetailsにisFavoriteとscaffoldMessengerを渡す
-            children: _buildPlaceDetails(context, detail, isFavorite, scaffoldMessenger),
+      backgroundColor: AppColor.background,
+      body: !state.detail.containsKey(widget.placeId) ? Center(child: Text('place_detail.info_not_found'.tr())) :
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child:
+          SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              // _buildPlaceDetailsにisFavoriteとscaffoldMessengerを渡す
+              children: _buildPlaceDetails(context, detail, isFavorite, scaffoldMessenger),
+            ),
           ),
         ),
-      ),
     );
   }
 

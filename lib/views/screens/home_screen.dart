@@ -3,6 +3,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ramen_recommendation/models/ramen_state.dart';
+import 'package:ramen_recommendation/utils/color.dart';
 import 'package:ramen_recommendation/viewmodels/home_viewmodel.dart';
 import 'package:ramen_recommendation/views/screens/base/error_listening_screen.dart';
 import 'package:ramen_recommendation/views/screens/favorite_places_screen.dart';
@@ -49,8 +50,10 @@ class _HomeScreenState extends ErrorListeningScreen<HomeScreen> with WidgetsBind
     final homeState = ref.watch(homeViewModelProvider);
 
     return Scaffold(
+      backgroundColor: AppColor.background,
       appBar: AppBar(
         title: Text('app_title'.tr()),
+        backgroundColor: AppColor.primary,
         actions: [
           IconButton(
             icon: const Icon(Icons.star),

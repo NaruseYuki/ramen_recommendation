@@ -3,7 +3,9 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:ramen_recommendation/views/screens/favorite_places_screen.dart';
-import 'package:ramen_recommendation/views/screens/home_screen.dart'; // HomeScreenをインポート
+import 'package:ramen_recommendation/views/screens/home_screen.dart';
+
+import '../../../utils/color.dart'; // HomeScreenをインポート
 
 class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});
@@ -23,7 +25,7 @@ class AppDrawer extends StatelessWidget {
         children: [
           const DrawerHeader(
             decoration: BoxDecoration(
-              color: Colors.green,
+              color: AppColor.secondary,
             ),
             child: Center(
               child: Text(

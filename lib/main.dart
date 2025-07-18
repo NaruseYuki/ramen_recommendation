@@ -2,6 +2,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ramen_recommendation/utils/color.dart';
 import 'package:ramen_recommendation/views/screens/home_screen.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
@@ -43,8 +44,7 @@ class MyApp extends StatelessWidget {
 
   ThemeData _buildThemeData() {
     return ThemeData(
-      primarySwatch: Colors.green,
-      fontFamily: 'Noto Sans JP', // フォントを指定
+      fontFamily: 'Noto Sans JP',
       appBarTheme: _buildAppBarTheme(),
       elevatedButtonTheme: _buildElevatedButtonTheme(),
       cardTheme: _buildCardTheme(),
@@ -53,7 +53,7 @@ class MyApp extends StatelessWidget {
 
   AppBarTheme _buildAppBarTheme() {
     return const AppBarTheme(
-      backgroundColor: Colors.green,
+      backgroundColor: AppColor.primary,
       foregroundColor: Colors.white,
       titleTextStyle: TextStyle(
         fontSize: 20,
@@ -65,7 +65,7 @@ class MyApp extends StatelessWidget {
   ElevatedButtonThemeData _buildElevatedButtonTheme() {
     return ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.green,
+        backgroundColor: AppColor.primary,
         foregroundColor: Colors.white,
         textStyle: const TextStyle(
           fontSize: 16,

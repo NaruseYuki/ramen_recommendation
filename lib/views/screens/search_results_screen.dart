@@ -3,6 +3,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ramen_recommendation/models/ramen_place.dart';
+import 'package:ramen_recommendation/utils/color.dart';
 import 'package:ramen_recommendation/viewmodels/search_results_viewmodel.dart';
 import 'package:ramen_recommendation/views/screens/base/error_listening_screen.dart';
 import 'package:ramen_recommendation/views/screens/place_detail_screen.dart';
@@ -50,7 +51,7 @@ class _SearchResultsScreenState extends ErrorListeningScreen<SearchResultsScreen
             onTap: () {
               showModalBottomSheet(
                 context: context,
-                backgroundColor: Colors.green,
+                backgroundColor: AppColor.primary,
                 isScrollControlled: true, // 全画面のボトムシートにする場合
                 useSafeArea: true, // セーフエリアを考慮する場合
                 showDragHandle: true,

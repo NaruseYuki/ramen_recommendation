@@ -7,6 +7,8 @@ import 'package:ramen_recommendation/views/screens/base/error_listening_screen.d
 import 'package:ramen_recommendation/views/screens/place_detail_screen.dart';
 import 'package:easy_localization/easy_localization.dart';
 
+import '../../utils/color.dart';
+
 class FavoritePlacesScreen extends ConsumerStatefulWidget {
   const FavoritePlacesScreen({super.key});
 
@@ -35,7 +37,9 @@ class _FavoritePlacesScreenState extends ErrorListeningScreen<FavoritePlacesScre
     final scaffoldMessenger = ScaffoldMessenger.of(context);
 
     return Scaffold(
+      backgroundColor: AppColor.background,
       appBar: AppBar(
+        backgroundColor: AppColor.primary,
         title: Text('favorite.title'.tr()),
       ),
       body: state.isLoading
@@ -75,7 +79,7 @@ class _FavoritePlacesScreenState extends ErrorListeningScreen<FavoritePlacesScre
             onTap: () {
               showModalBottomSheet(
                 context: context,
-                backgroundColor: Colors.green, // ボトムシートの背景色を設定
+                backgroundColor: AppColor.primary, // ボトムシートの背景色を設定
                 isScrollControlled: true, // 全画面のボトムシートにする場合
                 useSafeArea: true, // セーフエリアを考慮する場合
                 showDragHandle: true,
