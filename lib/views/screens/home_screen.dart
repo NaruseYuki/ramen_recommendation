@@ -103,16 +103,16 @@ class _HomeScreenState extends ErrorListeningScreen<HomeScreen>
             borderRadius: BorderRadius.circular(16), // ← ここで角丸を指定
             child: Image.file(
               state.imageFile!,
-              fit: BoxFit.fitWidth,
               width: double.infinity,
+              fit: BoxFit.contain,
             ),
           )
         : ClipRRect(
             borderRadius: BorderRadius.circular(16),
             child: Image.asset(
               'assets/images/ic_no_image.jpg',
-              fit: BoxFit.fitWidth,
               width: double.infinity,
+              fit: BoxFit.contain,
               colorBlendMode: BlendMode.srcOver,
               color: AppColor.background.withValues(alpha: 0.5),
             ),

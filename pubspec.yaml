@@ -58,6 +58,7 @@ dependencies:
   retrofit_generator: ^9.2.0
   package_info_plus: ^8.3.0
   flutter_native_splash: ^2.4.4
+  flutter_launcher_icons: ^0.14.4
 
 dev_dependencies:
   flutter_test:
@@ -77,16 +78,26 @@ dev_dependencies:
   json_serializable: ^6.9.5
 
 flutter_native_splash:
-  image: assets/images/ic_logo.png # スプラッシュ画面の画像
+  image: assets/images/ic_splash.png # スプラッシュ画面の画像
   android_gravity: center
   ios_content_mode: center
-  color: "#000000" # スプラッシュ画面の背景色
-  image_dark: assets/images/ic_logo.png # ダークモードのスプラッシュ画面の画像
+  color: "#E15500" # スプラッシュ画面の背景色
+  image_dark: assets/images/ic_splash.png # ダークモードのスプラッシュ画面の画像
   android: true
   ios: true
   fullscreen: true  #trueで通知バーが非表示になる
   android_12:
-    image: assets/images/ic_logo.png # Android 12のスプラッシュ画面の画像
+    image: assets/images/ic_splash.png # Android 12のスプラッシュ画面の画像
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  adaptive_icon_background: "#E15500" # アイコンの背景色
+  remove_alpha_android: true # アイコンの白色箇所を削除するのに必要
+  remove_alpha_ios: true # アイコンの白色箇所を削除するのに必要
+  image_path_android: 'assets/images/ic_android.png'
+  adaptive_icon_foreground: "assets/images/ic_android.png"
+  image_path_ios: 'assets/images/ic_ios.png'
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
