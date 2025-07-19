@@ -1,4 +1,6 @@
 // lib/views/screens/home_screen.dart
+import 'dart:io';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -81,42 +83,86 @@ class _HomeScreenState extends ErrorListeningScreen<HomeScreen> with WidgetsBind
       ),
       bottomNavigationBar: homeState.isLoading
           ? const SizedBox.shrink()
-          : _buildBottomBar(context, homeState),
+          : _searchButton(context, homeState),
     );
   }
 
   Widget _buildContent(BuildContext context, RamenState state) {
     List<Widget> children = [];
 
-    if (state.imageFile == null) {
-      children.add( Text('home.select_image'.tr()));
-    } else {
-      children.add(
-        Image.file(
-          state.imageFile!,
-          width: 300,
-          height: 300,
-        ),
-      );
-    }
+    final imageWidget = state.imageFile != null
+        ? ClipRRect(
+      borderRadius: BorderRadius.circular(16), // ← ここで角丸を指定
+      child: Image.file(
+        state.imageFile!,
+        fit: BoxFit.fitWidth,
+        width: double.infinity,
+      ),
+    )
+        : ClipRRect(
+      borderRadius: BorderRadius.circular(16),
+      child: Image.asset(
+        'assets/images/ic_no_image.jpg',
+        fit: BoxFit.fitWidth,
+        width: double.infinity,
+        colorBlendMode: BlendMode.srcOver,
+        color: AppColor.background.withOpacity(0.5),
+      ),
+    );
 
-    children.addAll([
-      ElevatedButton(
-        onPressed: () async {
-          await homeViewModel.pickImageFromGalleryWithPermission();
-        },
-        child: Text('home.gallery_select'.tr()),
-      ),
-      ElevatedButton(
-        onPressed: () async {
-          await homeViewModel.pickImageFromCameraWithPermission();
-        },
-        child: Text('home.camera_capture'.tr()),
-      ),
-    ]);
+    children.add(imageWidget);
+
+    children.add(
+      const SizedBox(height: 20),
+    );
+
+    children.add(
+      Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            // カメラ画像ボタン
+            InkWell(
+              onTap: () async {
+                await homeViewModel.pickImageFromCameraWithPermission();
+              },
+              child: CircleAvatar(
+                radius: 75,
+                backgroundColor: Colors.white,
+                  child: Image.asset(
+                    'assets/images/ic_camera.jpeg',
+                    width: 75,
+                    height: 75
+                  ),
+              ),
+            ),
+            // ギャラリー画像ボタン
+            InkWell(
+              onTap: () async {
+                await homeViewModel.pickImageFromGalleryWithPermission();
+              },
+              child: CircleAvatar(
+                radius: 75,
+                backgroundColor: Colors.white, // 余白部分の背景色
+                  child: Image.asset(
+                    'assets/images/ic_picture.jpeg',
+                    width: 75,
+                    height: 75,
+                  ),
+              ),
+            ),
+          ]
+      )
+    );
+
+    children.add(
+      const SizedBox(height: 20),
+    );
 
     if (state.result != null) {
-      children.add(Text('home.analysis_result'.tr(args: [state.result ?? ''])));
+      children.add(
+          Text('home.analysis_result'.tr(args: [state.result ?? '']),
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)
+          )
+      );
     }
 
     return Column(
@@ -125,7 +171,7 @@ class _HomeScreenState extends ErrorListeningScreen<HomeScreen> with WidgetsBind
     );
   }
 
-  Widget _buildBottomBar(BuildContext context, RamenState state) {
+  Widget _searchButton(BuildContext context, RamenState state) {
     final isSearchDisabled =
         state.result == null || state.result?.split(' ')[0] == '4';
     final keyword = state.result?.split(' ')[1] ?? '';
@@ -141,12 +187,19 @@ class _HomeScreenState extends ErrorListeningScreen<HomeScreen> with WidgetsBind
           );
           Navigator.push(context, route);
         },
-        child: Text(
-          isSearchDisabled
-              ? 'home.search_disabled'.tr()
-              : 'home.search_nearby'.tr(),
-        ),
-      ),
+        child: SizedBox(
+          width: double.infinity,
+          height: 50,
+          child: Center(
+            child: Text(
+              isSearchDisabled
+                  ? 'home.search_disabled'.tr()
+                  : 'home.search_nearby'.tr(),
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+          ),
+        )
+      )
     );
   }
 }

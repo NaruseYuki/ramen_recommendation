@@ -16,6 +16,7 @@ abstract class RamenState<T> with _$RamenState<T> {
     File? imageFile,
     String? result,
     @Default(false) bool isLoading, // デフォルト値: false
+    AppErrorCode? error,
     @Default([]) List<T> places, // デフォルト値: 空のリスト
     @Default({}) Set<String> favoritePlaceIds, // デフォルト値: 空のセット
     @Default({}) Map<String, GetPlaceDetailsResponse> detail, // デフォルト値: 空のマップ
@@ -26,6 +27,7 @@ abstract class RamenState<T> with _$RamenState<T> {
         imageFile: null,
         result: null,
         isLoading: false,
+        error: null,
         places: [],
         favoritePlaceIds: {},
         detail: {},
