@@ -1,6 +1,4 @@
 // lib/views/screens/home_screen.dart
-import 'dart:io';
-
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -20,7 +18,8 @@ class HomeScreen extends ConsumerStatefulWidget {
   ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends ErrorListeningScreen<HomeScreen> with WidgetsBindingObserver {
+class _HomeScreenState extends ErrorListeningScreen<HomeScreen>
+    with WidgetsBindingObserver {
   late HomeViewModel homeViewModel;
 
   @override
@@ -75,11 +74,11 @@ class _HomeScreenState extends ErrorListeningScreen<HomeScreen> with WidgetsBind
         child: homeState.isLoading
             ? const CircularProgressIndicator()
             : SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: _buildContent(context, homeState),
-          ),
-        ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: _buildContent(context, homeState),
+                ),
+              ),
       ),
       bottomNavigationBar: homeState.isLoading
           ? const SizedBox.shrink()
@@ -90,25 +89,34 @@ class _HomeScreenState extends ErrorListeningScreen<HomeScreen> with WidgetsBind
   Widget _buildContent(BuildContext context, RamenState state) {
     List<Widget> children = [];
 
+    if (state.result != null) {
+      children.add(Text('home.analysis_result'.tr(args: [state.result ?? '']),
+          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)));
+    }
+
+    children.add(
+      const SizedBox(height: 20),
+    );
+
     final imageWidget = state.imageFile != null
         ? ClipRRect(
-      borderRadius: BorderRadius.circular(16), // ← ここで角丸を指定
-      child: Image.file(
-        state.imageFile!,
-        fit: BoxFit.fitWidth,
-        width: double.infinity,
-      ),
-    )
+            borderRadius: BorderRadius.circular(16), // ← ここで角丸を指定
+            child: Image.file(
+              state.imageFile!,
+              fit: BoxFit.fitWidth,
+              width: double.infinity,
+            ),
+          )
         : ClipRRect(
-      borderRadius: BorderRadius.circular(16),
-      child: Image.asset(
-        'assets/images/ic_no_image.jpg',
-        fit: BoxFit.fitWidth,
-        width: double.infinity,
-        colorBlendMode: BlendMode.srcOver,
-        color: AppColor.background.withOpacity(0.5),
-      ),
-    );
+            borderRadius: BorderRadius.circular(16),
+            child: Image.asset(
+              'assets/images/ic_no_image.jpg',
+              fit: BoxFit.fitWidth,
+              width: double.infinity,
+              colorBlendMode: BlendMode.srcOver,
+              color: AppColor.background.withValues(alpha: 0.5),
+            ),
+          );
 
     children.add(imageWidget);
 
@@ -116,54 +124,40 @@ class _HomeScreenState extends ErrorListeningScreen<HomeScreen> with WidgetsBind
       const SizedBox(height: 20),
     );
 
-    children.add(
-      Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            // カメラ画像ボタン
-            InkWell(
-              onTap: () async {
-                await homeViewModel.pickImageFromCameraWithPermission();
-              },
-              child: CircleAvatar(
-                radius: 75,
-                backgroundColor: Colors.white,
-                  child: Image.asset(
-                    'assets/images/ic_camera.jpeg',
-                    width: 75,
-                    height: 75
-                  ),
-              ),
-            ),
-            // ギャラリー画像ボタン
-            InkWell(
-              onTap: () async {
-                await homeViewModel.pickImageFromGalleryWithPermission();
-              },
-              child: CircleAvatar(
-                radius: 75,
-                backgroundColor: Colors.white, // 余白部分の背景色
-                  child: Image.asset(
-                    'assets/images/ic_picture.jpeg',
-                    width: 75,
-                    height: 75,
-                  ),
-              ),
-            ),
-          ]
-      )
-    );
+    children
+        .add(Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+      // カメラ画像ボタン
+      InkWell(
+        onTap: () async {
+          await homeViewModel.pickImageFromCameraWithPermission();
+        },
+        child: CircleAvatar(
+          radius: 75,
+          backgroundColor: Colors.white,
+          child: Image.asset('assets/images/ic_camera.jpeg',
+              width: 75, height: 75),
+        ),
+      ),
+      // ギャラリー画像ボタン
+      InkWell(
+        onTap: () async {
+          await homeViewModel.pickImageFromGalleryWithPermission();
+        },
+        child: CircleAvatar(
+          radius: 75,
+          backgroundColor: Colors.white, // 余白部分の背景色
+          child: Image.asset(
+            'assets/images/ic_picture.jpeg',
+            width: 75,
+            height: 75,
+          ),
+        ),
+      ),
+    ]));
 
     children.add(
       const SizedBox(height: 20),
     );
-
-    if (state.result != null) {
-      children.add(
-          Text('home.analysis_result'.tr(args: [state.result ?? '']),
-            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)
-          )
-      );
-    }
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -177,29 +171,29 @@ class _HomeScreenState extends ErrorListeningScreen<HomeScreen> with WidgetsBind
     final keyword = state.result?.split(' ')[1] ?? '';
 
     return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: ElevatedButton(
-        onPressed: isSearchDisabled
-            ? null
-            : () {
-          final route = MaterialPageRoute(
-            builder: (context) => SearchResultsScreen(ramenType: keyword),
-          );
-          Navigator.push(context, route);
-        },
-        child: SizedBox(
-          width: double.infinity,
-          height: 50,
-          child: Center(
-            child: Text(
-              isSearchDisabled
-                  ? 'home.search_disabled'.tr()
-                  : 'home.search_nearby'.tr(),
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-          ),
-        )
-      )
-    );
+        padding: const EdgeInsets.all(8.0),
+        child: ElevatedButton(
+            onPressed: isSearchDisabled
+                ? null
+                : () {
+                    final route = MaterialPageRoute(
+                      builder: (context) =>
+                          SearchResultsScreen(ramenType: keyword),
+                    );
+                    Navigator.push(context, route);
+                  },
+            child: SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: Center(
+                child: Text(
+                  isSearchDisabled
+                      ? 'home.search_disabled'.tr()
+                      : 'home.search_nearby'.tr(),
+                  style: const TextStyle(
+                      fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+              ),
+            )));
   }
 }
