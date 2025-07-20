@@ -26,11 +26,10 @@ class AppDrawer extends StatelessWidget {
         color: AppColor.primary.withValues(alpha: 0.2),
         child: ListView(
           children: [
-            DrawerHeader(
-                padding: const EdgeInsets.all(0.0),
-                margin: const EdgeInsets.all(0.0),
-                child: Image.asset('assets/images/ic_drawer_header.png',
-                    fit: BoxFit.fill)),
+            const Divider(
+              thickness: 1.0,
+              color: Colors.black,
+            ),
             ...menuKeys.map(
                 // mapでmenuKeysの各要素（キー文字列）を_buildListTileに渡す
                 (key) => _buildListTile(context, key)),

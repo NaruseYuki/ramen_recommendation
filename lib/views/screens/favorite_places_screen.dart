@@ -41,6 +41,7 @@ class _FavoritePlacesScreenState
       backgroundColor: AppColor.background,
       appBar: AppBar(
         backgroundColor: AppColor.primary,
+        centerTitle: true,
         title: Text('favorite.title'.tr()),
       ),
       body: state.isLoading

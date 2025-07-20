@@ -65,7 +65,7 @@ class _PlaceDetailScreenState extends ErrorListeningScreen<PlaceDetailScreen> {
                           detail.name, // 店名を固定タイトルとして表示
                           style: const TextStyle(
                               fontSize: 24, fontWeight: FontWeight.bold),
-                          maxLines: 2, // 必要に応じて複数行を許可
+                          maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
@@ -117,10 +117,19 @@ class _PlaceDetailScreenState extends ErrorListeningScreen<PlaceDetailScreen> {
                         ),
                         const SizedBox(height: 16),
                         if (detail.rating != null) _buildRating(detail),
+                        Text(
+                          'place_detail.opening_hours'.tr(),
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
                         if (detail.weekdayDescriptions.isNotEmpty)
                           _buildOpeningHoursSection(detail),
+                        const SizedBox(height: 16),
                         if (detail.reviews.isNotEmpty)
-                          _buildReviewsSection(detail),
+                          Text(
+                            'place_detail.reviews'.tr(),
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        _buildReviewsSection(detail),
                       ],
                     ),
                   ),
@@ -134,73 +143,6 @@ class _PlaceDetailScreenState extends ErrorListeningScreen<PlaceDetailScreen> {
         ref,
       ),
     );
-  }
-
-  // isFavoriteとScaffoldMessengerStateを引数に追加
-  List<Widget> _buildPlaceDetails(BuildContext context, details,
-      bool isFavorite, ScaffoldMessengerState scaffoldMessenger) {
-    List<Widget> list = [
-      Row(
-        // 店名と星アイコンを横並びにするためにRowで囲む
-        children: [
-          Expanded(
-            // 店名が利用可能なスペースを占めるようにする
-            child: Text(
-              details.name,
-              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-          ),
-          IconButton(
-            // お気に入りアイコンをここに移動
-            icon: Icon(
-              isFavorite ? Icons.star : Icons.star_border,
-              color: isFavorite ? Colors.amber : null, // お気に入り状態によって色を変える
-            ),
-            onPressed: () async {
-              final result =
-                  await placeDetailViewmodel.toggleFavorite(RamenPlace(
-                id: details.id,
-                displayName: DisplayName(text: details.name),
-                address: details.address,
-                location: Location(
-                    latitude: details.latitude, longitude: details.longitude),
-              ));
-              if (result) {
-                // UI更新が成功した場合のみSnack barを表示
-                scaffoldMessenger.showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      isFavorite // ここはトグル後の状態ではなく、トグル前の状態をチェック
-                          ? 'favorite.remove_success'.tr() // お気に入りだったものが削除された場合
-                          : 'favorite.add_success'
-                              .tr(), // お気に入りではなかったものが追加された場合
-                    ),
-                  ),
-                );
-              }
-            },
-          ),
-        ],
-      ),
-      const SizedBox(height: 8),
-      Text(
-        details.address,
-        style: const TextStyle(fontSize: 16),
-      ),
-      const SizedBox(height: 16),
-    ];
-
-    if (details.rating != null) {
-      list.add(_buildRating(details));
-    }
-    if (details.weekdayDescriptions.isNotEmpty) {
-      list.add(_buildOpeningHoursSection(details));
-    }
-
-    if (details.reviews.isNotEmpty) {
-      list.add(_buildReviewsSection(details));
-    }
-    return list;
   }
 
   Widget _buildRating(details) {
@@ -222,16 +164,20 @@ class _PlaceDetailScreenState extends ErrorListeningScreen<PlaceDetailScreen> {
   }
 
   Widget _buildOpeningHoursSection(details) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'place_detail.opening_hours'.tr(),
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
-        ...details.weekdayDescriptions.map((text) => Text(text)).toList(),
-        const SizedBox(height: 16),
-      ],
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey.shade300),
+        borderRadius: BorderRadius.circular(8.0),
+        color: Colors.white, // 背景色を薄くする
+      ),
+      width: double.infinity,
+      padding: const EdgeInsets.all(8.0), // 内側のパディングを追加
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ...details.weekdayDescriptions.map((text) => Text(text)).toList(),
+        ],
+      ),
     );
   }
 
@@ -239,10 +185,6 @@ class _PlaceDetailScreenState extends ErrorListeningScreen<PlaceDetailScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'place_detail.reviews'.tr(),
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
         ...details.reviews.map((review) => _buildReviewTile(review)).toList(),
         if (details.reviews.isEmpty) Text('place_detail.no_reviews'.tr()),
         const SizedBox(height: 16),
@@ -257,6 +199,7 @@ class _PlaceDetailScreenState extends ErrorListeningScreen<PlaceDetailScreen> {
       decoration: BoxDecoration(
         border: Border.all(color: Colors.grey.shade300),
         borderRadius: BorderRadius.circular(8.0),
+        color: Colors.white,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -285,7 +228,6 @@ class _PlaceDetailScreenState extends ErrorListeningScreen<PlaceDetailScreen> {
     );
   }
 
-  // launchUrlエラーハンドリングの追加 (errorMessageProviderに設定)
   Future<void> _launchMap(String name) async {
     final url = Uri.parse('https://www.google.com/maps?q=$name');
     if (await canLaunchUrl(url)) {
