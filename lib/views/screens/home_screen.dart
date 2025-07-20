@@ -53,8 +53,11 @@ class _HomeScreenState extends ErrorListeningScreen<HomeScreen>
     return Scaffold(
       backgroundColor: AppColor.background,
       appBar: AppBar(
-        title: Text('app_title'.tr()),
-        backgroundColor: AppColor.primary,
+        title: Image.asset(
+          'assets/images/ic_splash.png',
+          fit: BoxFit.fill,
+        ),
+        centerTitle: true,
         actions: [
           IconButton(
             icon: const Icon(Icons.star),
@@ -104,18 +107,15 @@ class _HomeScreenState extends ErrorListeningScreen<HomeScreen>
             child: Image.file(
               state.imageFile!,
               fit: BoxFit.fitWidth,
-              width: double.infinity,
             ),
           )
         : ClipRRect(
             borderRadius: BorderRadius.circular(16),
-            child: Image.asset(
-              'assets/images/ic_no_image.jpg',
-              fit: BoxFit.fitWidth,
-              width: double.infinity,
-              colorBlendMode: BlendMode.srcOver,
-              color: AppColor.background.withValues(alpha: 0.5),
-            ),
+            child: Image.asset('assets/images/ic_no_image.png',
+                width: double.infinity,
+                fit: BoxFit.contain,
+                colorBlendMode: BlendMode.dstOver,
+                color: Colors.white),
           );
 
     children.add(imageWidget);

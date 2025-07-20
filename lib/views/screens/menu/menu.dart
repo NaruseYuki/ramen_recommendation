@@ -5,7 +5,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:ramen_recommendation/views/screens/favorite_places_screen.dart';
 import 'package:ramen_recommendation/views/screens/home_screen.dart';
 
-import '../../../utils/color.dart'; // HomeScreenをインポート
+import '../../../utils/color.dart';
 
 class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});
@@ -21,31 +21,21 @@ class AppDrawer extends StatelessWidget {
     ];
 
     return Drawer(
-      child: ListView(
-        children: [
-          const DrawerHeader(
-            decoration: BoxDecoration(
-              color: AppColor.secondary,
+      // Drawer の子として Material を追加し、その色を設定
+      child: Material(
+        color: AppColor.primary.withValues(alpha: 0.2),
+        child: ListView(
+          children: [
+            const Divider(
+              thickness: 1.0,
+              color: Colors.black,
             ),
-            child: Center(
-              child: Text(
-                'DrawerHeader', // ここも必要であれば 'drawer_header_title'.tr() のように翻訳キーを使用できます
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20,
-                ),
-              ),
-            ),
-          ),
-          const Divider(
-            thickness: 1.0,
-            color: Colors.black,
-          ),
-          ...menuKeys.map(
-            // mapでmenuKeysの各要素（キー文字列）を_buildListTileに渡す
-                (key) => _buildListTile(context, key),
-          )
-        ],
+            ...menuKeys.map(
+                // mapでmenuKeysの各要素（キー文字列）を_buildListTileに渡す
+                (key) => _buildListTile(context, key)),
+            // TODO 今後シェア機能つけたい
+          ],
+        ),
       ),
     );
   }
@@ -72,8 +62,10 @@ class AppDrawer extends StatelessWidget {
                     ),
                   ),
                 ),
-                const IconButton( // onPressedがないためconstにできる
-                  onPressed: null, // 全体がInkWellでタップされるので、IconButtonのonPressedは不要
+                const IconButton(
+                  // onPressedがないためconstにできる
+                  onPressed: null,
+                  // 全体がInkWellでタップされるので、IconButtonのonPressedは不要
                   icon: Icon(Icons.arrow_circle_right),
                 )
               ],
@@ -94,7 +86,10 @@ class AppDrawer extends StatelessWidget {
     // 翻訳前のキー文字列で分岐する
     switch (menuKey) {
       case 'menu.top':
-        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const HomeScreen()), (route) => false);
+        Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => const HomeScreen()),
+            (route) => false);
         break;
       case 'menu.favorite':
         Navigator.push(
@@ -105,8 +100,8 @@ class AppDrawer extends StatelessWidget {
         );
         break;
       case 'menu.archive':
-      // coming soon
-      // 実装がないため、一時的なメッセージを表示
+        // coming soon
+        // 実装がないため、一時的なメッセージを表示
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('バージョンアップをお待ちください。: ${menuKey.tr()}')),
         );
@@ -123,7 +118,6 @@ class AppDrawer extends StatelessWidget {
         }
         break;
       default:
-      // 予期しないキーの場合の処理（例: 何もしない、エラーログを出すなど）
         break;
     }
   }
