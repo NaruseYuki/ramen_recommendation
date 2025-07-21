@@ -49,7 +49,6 @@ class _HomeScreenState extends ErrorListeningScreen<HomeScreen>
   @override
   Widget build(BuildContext context) {
     final homeState = ref.watch(homeViewModelProvider);
-
     return Scaffold(
       backgroundColor: AppColor.background,
       appBar: AppBar(
