@@ -68,12 +68,8 @@ class _TabScreenState extends State<TabScreen>
             IconButton(
               icon: const Icon(Icons.star),
               onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const FavoritePlacesScreen(),
-                  ),
-                );
+                // お気に入りタブに移動
+                _tabController.animateTo(3);
               },
             ),
           ],
@@ -107,6 +103,7 @@ class _TabScreenState extends State<TabScreen>
             labelColor: Colors.white,
             unselectedLabelColor: Colors.grey,
             indicatorSize: TabBarIndicatorSize.tab,
+            indicatorAnimation: TabIndicatorAnimation.elastic,
             tabs: [
               buildTab('分析する', 'assets/images/ic_analyze.png', 0),
               buildTab('探す', 'assets/images/ic_search.png', 1),
