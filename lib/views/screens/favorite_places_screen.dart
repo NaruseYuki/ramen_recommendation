@@ -39,11 +39,11 @@ class _FavoritePlacesScreenState
 
     return Scaffold(
       backgroundColor: AppColor.background,
-      appBar: AppBar(
-        backgroundColor: AppColor.primary,
-        centerTitle: true,
-        title: Text('favorite.title'.tr()),
-      ),
+      // appBar: AppBar(
+      //   backgroundColor: AppColor.primary,
+      //   centerTitle: true,
+      //   title: Text('favorite.title'.tr()),
+      // ),
       body: state.isLoading
           ? const Center(child: CircularProgressIndicator())
           : state.places.isEmpty

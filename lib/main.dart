@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ramen_recommendation/utils/color.dart';
-import 'package:ramen_recommendation/views/screens/home_screen.dart';
+import 'package:ramen_recommendation/views/screens/tab/tab_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -34,7 +34,6 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final ezContext = EasyLocalization.of(context)!;
     return MaterialApp(
-      useInheritedMediaQuery: true,
       // DevicePreviewのために必要
       // localeプロパティはDevicePreviewとEasyLocalizationの両方で設定されているため、
       // DevicePreviewを使用する場合はDevicePreview.locale(context)を使用し、EasyLocalizationのlocaleも考慮します。
@@ -56,7 +55,7 @@ class MyApp extends StatelessWidget {
       //
       theme: _buildThemeData(),
       //
-      home: HomeScreen(), //
+      home: TabScreen(), //
     );
   }
 
