@@ -15,8 +15,8 @@ class HomeScreen extends ConsumerStatefulWidget {
   ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends ErrorListeningScreen<HomeScreen>
-    with WidgetsBindingObserver {
+class _HomeScreenState extends ConsumerState<HomeScreen>
+    with ErrorListeningMixin<HomeScreen>, WidgetsBindingObserver {
   late HomeViewModel homeViewModel;
 
   @override
@@ -45,6 +45,7 @@ class _HomeScreenState extends ErrorListeningScreen<HomeScreen>
 
   @override
   Widget build(BuildContext context) {
+    setupErrorListener(ref);
     final homeState = ref.watch(homeViewModelProvider);
     return Scaffold(
       backgroundColor: AppColor.background,

@@ -18,8 +18,8 @@ class FavoritePlacesScreen extends ConsumerStatefulWidget {
 }
 
 // ErrorListeningPageを継承
-class _FavoritePlacesScreenState
-    extends ErrorListeningScreen<FavoritePlacesScreen> {
+class _FavoritePlacesScreenState extends ConsumerState<FavoritePlacesScreen>
+    with ErrorListeningMixin<FavoritePlacesScreen>, WidgetsBindingObserver {
   late FavoritePlacesViewModel favoritePlacesViewModel;
 
   @override
@@ -34,16 +34,12 @@ class _FavoritePlacesScreenState
 
   @override
   Widget build(BuildContext context) {
+    setupErrorListener(ref);
     final state = ref.watch(favoritePlacesViewModelProvider);
     final scaffoldMessenger = ScaffoldMessenger.of(context);
 
     return Scaffold(
       backgroundColor: AppColor.background,
-      // appBar: AppBar(
-      //   backgroundColor: AppColor.primary,
-      //   centerTitle: true,
-      //   title: Text('favorite.title'.tr()),
-      // ),
       body: state.isLoading
           ? const Center(child: CircularProgressIndicator())
           : state.places.isEmpty

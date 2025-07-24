@@ -19,8 +19,8 @@ class SearchResultsScreen extends ConsumerStatefulWidget {
 }
 
 // ErrorListeningPageを継承
-class _SearchResultsScreenState
-    extends ErrorListeningScreen<SearchResultsScreen> {
+class _SearchResultsScreenState extends ConsumerState<SearchResultsScreen>
+    with ErrorListeningMixin<SearchResultsScreen>, WidgetsBindingObserver {
   @override
   void initState() {
     super.initState(); // ErrorListeningPageのinitStateを呼び出す
@@ -33,6 +33,7 @@ class _SearchResultsScreenState
 
   @override
   Widget build(BuildContext context) {
+    setupErrorListener(ref);
     final locationState = ref.watch(searchResultsViewModelProvider);
 
     return Scaffold(

@@ -22,7 +22,8 @@ class PlaceDetailScreen extends ConsumerStatefulWidget {
 }
 
 // ErrorListeningPageを継承
-class _PlaceDetailScreenState extends ErrorListeningScreen<PlaceDetailScreen> {
+class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen>
+    with ErrorListeningMixin<PlaceDetailScreen>, WidgetsBindingObserver {
   late PlaceDetailViewModel placeDetailViewmodel;
 
   @override
@@ -36,6 +37,7 @@ class _PlaceDetailScreenState extends ErrorListeningScreen<PlaceDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    setupErrorListener(ref);
     final scaffoldMessenger = ScaffoldMessenger.of(context);
     final state = ref.watch(placeDetailViewModelProvider);
 
