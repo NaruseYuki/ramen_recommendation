@@ -6,10 +6,7 @@ import 'package:ramen_recommendation/models/ramen_state.dart';
 import 'package:ramen_recommendation/utils/color.dart';
 import 'package:ramen_recommendation/viewmodels/home_viewmodel.dart';
 import 'package:ramen_recommendation/views/screens/base/error_listening_screen.dart';
-import 'package:ramen_recommendation/views/screens/favorite_places_screen.dart';
 import 'package:ramen_recommendation/views/screens/search_results_screen.dart';
-
-import 'menu/menu.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -18,8 +15,8 @@ class HomeScreen extends ConsumerStatefulWidget {
   ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends ErrorListeningScreen<HomeScreen>
-    with WidgetsBindingObserver {
+class _HomeScreenState extends ConsumerState<HomeScreen>
+    with ErrorListeningMixin<HomeScreen>, WidgetsBindingObserver {
   late HomeViewModel homeViewModel;
 
   @override
@@ -48,31 +45,10 @@ class _HomeScreenState extends ErrorListeningScreen<HomeScreen>
 
   @override
   Widget build(BuildContext context) {
+    setupErrorListener(ref);
     final homeState = ref.watch(homeViewModelProvider);
-
     return Scaffold(
-      backgroundColor: AppColor.background,
-      appBar: AppBar(
-        title: Image.asset(
-          'assets/images/ic_splash.png',
-          fit: BoxFit.fill,
-        ),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.star),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const FavoritePlacesScreen(),
-                ),
-              );
-            },
-          ),
-        ],
-      ),
-      drawer: const AppDrawer(),
+      backgroundColor: Colors.white,
       body: Center(
         child: homeState.isLoading
             ? const CircularProgressIndicator()
@@ -93,29 +69,31 @@ class _HomeScreenState extends ErrorListeningScreen<HomeScreen>
     List<Widget> children = [];
 
     if (state.result != null) {
-      children.add(Text('home.analysis_result'.tr(args: [state.result ?? '']),
-          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)));
+      children.addAll([
+        Text('home.analysis_result'.tr(args: [state.result ?? '']),
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+        const SizedBox(height: 20)
+      ]);
     }
-
-    children.add(
-      const SizedBox(height: 20),
-    );
 
     final imageWidget = state.imageFile != null
         ? ClipRRect(
             borderRadius: BorderRadius.circular(16), // ← ここで角丸を指定
             child: Image.file(
               state.imageFile!,
-              fit: BoxFit.fitWidth,
+              width: 250,
+              height: 250,
+              fit: BoxFit.contain,
             ),
           )
         : ClipRRect(
             borderRadius: BorderRadius.circular(16),
             child: Image.asset('assets/images/ic_no_image.png',
-                width: double.infinity,
+                width: 250,
+                height: 250,
                 fit: BoxFit.contain,
                 colorBlendMode: BlendMode.dstOver,
-                color: Colors.white),
+                color: AppColor.background),
           );
 
     children.add(imageWidget);
@@ -133,9 +111,9 @@ class _HomeScreenState extends ErrorListeningScreen<HomeScreen>
         },
         child: CircleAvatar(
           radius: 75,
-          backgroundColor: Colors.white,
-          child: Image.asset('assets/images/ic_camera.jpeg',
-              width: 75, height: 75),
+          backgroundColor: AppColor.secondary,
+          child: Image.asset('assets/images/ic_camera.png',
+              width: 100, height: 100),
         ),
       ),
       // ギャラリー画像ボタン
@@ -145,11 +123,11 @@ class _HomeScreenState extends ErrorListeningScreen<HomeScreen>
         },
         child: CircleAvatar(
           radius: 75,
-          backgroundColor: Colors.white, // 余白部分の背景色
+          backgroundColor: AppColor.secondary, // 余白部分の背景色
           child: Image.asset(
-            'assets/images/ic_picture.jpeg',
-            width: 75,
-            height: 75,
+            'assets/images/ic_picture.png',
+            width: 100,
+            height: 100,
           ),
         ),
       ),

@@ -8,5 +8,5 @@ class AppColor {
 
   static const Color primary = Color(0xFFE15500);
   static const Color secondary = Color(0xFF015C9A);
-  static const Color background = Color(0xFFEEEEEE);
+  static const Color background = Color(0xFFF5F5F5);
 }
