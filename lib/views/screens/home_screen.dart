@@ -48,7 +48,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     setupErrorListener(ref);
     final homeState = ref.watch(homeViewModelProvider);
     return Scaffold(
-      backgroundColor: AppColor.background,
+      backgroundColor: Colors.white,
       body: Center(
         child: homeState.isLoading
             ? const CircularProgressIndicator()
@@ -93,7 +93,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                 height: 250,
                 fit: BoxFit.contain,
                 colorBlendMode: BlendMode.dstOver,
-                color: Colors.white),
+                color: AppColor.background),
           );
 
     children.add(imageWidget);
@@ -111,9 +111,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         },
         child: CircleAvatar(
           radius: 75,
-          backgroundColor: Colors.white,
-          child: Image.asset('assets/images/ic_camera.jpeg',
-              width: 75, height: 75),
+          backgroundColor: AppColor.secondary,
+          child: Image.asset('assets/images/ic_camera.png',
+              width: 100, height: 100),
         ),
       ),
       // ギャラリー画像ボタン
@@ -123,11 +123,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         },
         child: CircleAvatar(
           radius: 75,
-          backgroundColor: Colors.white, // 余白部分の背景色
+          backgroundColor: AppColor.secondary, // 余白部分の背景色
           child: Image.asset(
-            'assets/images/ic_picture.jpeg',
-            width: 75,
-            height: 75,
+            'assets/images/ic_picture.png',
+            width: 100,
+            height: 100,
           ),
         ),
       ),

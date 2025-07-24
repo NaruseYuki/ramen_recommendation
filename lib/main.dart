@@ -70,11 +70,11 @@ class MyApp extends StatelessWidget {
 
   AppBarTheme _buildAppBarTheme() {
     return const AppBarTheme(
-      backgroundColor: AppColor.primary, //
-      foregroundColor: Colors.white, //
+      backgroundColor: AppColor.primary,
+      foregroundColor: Colors.white,
       titleTextStyle: TextStyle(
         fontSize: 20, //
-        fontWeight: FontWeight.bold, //
+        fontWeight: FontWeight.bold,
       ),
     );
   }

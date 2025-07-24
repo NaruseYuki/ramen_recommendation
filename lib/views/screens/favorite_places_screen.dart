@@ -39,7 +39,7 @@ class _FavoritePlacesScreenState extends ConsumerState<FavoritePlacesScreen>
     final scaffoldMessenger = ScaffoldMessenger.of(context);
 
     return Scaffold(
-      backgroundColor: AppColor.background,
+      backgroundColor: Colors.white,
       body: state.isLoading
           ? const Center(child: CircularProgressIndicator())
           : state.places.isEmpty
