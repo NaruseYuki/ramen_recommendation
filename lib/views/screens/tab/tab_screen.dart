@@ -45,7 +45,7 @@ class _TabScreenState extends State<TabScreen>
         height: 24,
         child: ColorFiltered(
           colorFilter: ColorFilter.mode(
-            isSelected ? Colors.white : Colors.grey,
+            isSelected ? Colors.white : Colors.white70,
             BlendMode.srcIn,
           ),
           child: Image.asset(assetPath, fit: BoxFit.contain),
@@ -97,7 +97,7 @@ class _TabScreenState extends State<TabScreen>
             labelPadding: const EdgeInsets.symmetric(horizontal: 4.0),
             indicatorColor: AppColor.secondary,
             labelColor: Colors.white,
-            unselectedLabelColor: Colors.grey,
+            unselectedLabelColor: Colors.white70,
             indicatorSize: TabBarIndicatorSize.tab,
             indicatorAnimation: TabIndicatorAnimation.elastic,
             tabs: [

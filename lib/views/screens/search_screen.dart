@@ -1,6 +1,7 @@
 // lib/views/screens/search_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ramen_recommendation/utils/color.dart';
 import 'package:ramen_recommendation/viewmodels/search_results_viewmodel.dart'; // searchResultsViewModelProviderをインポート
 import 'package:ramen_recommendation/views/screens/base/error_listening_screen.dart';
 
@@ -65,12 +66,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
   @override
   Widget build(BuildContext context) {
     setupErrorListener(ref);
-    final searchResultsState = ref.watch(searchResultsViewModelProvider);
-
     return Scaffold(
       appBar: AppBar(
-        // AppBarの背景色とテキストスタイルはmain.dartのテーマから取得
-        // titleの代わりに柔軟な検索バーを配置
         title: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 0.0), // 左右のパディングを調整
           child: Container(
@@ -103,12 +100,13 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
         ),
         bottom: TabBar(
           controller: _tabController,
-          indicatorColor: Colors.white,
+          indicatorColor: AppColor.secondary,
           // タブのインジケーターの色
           labelColor: Colors.white,
           // 選択されたタブのラベル色
           unselectedLabelColor: Colors.white70,
           // 未選択のタブのラベル色
+          indicatorSize: TabBarIndicatorSize.tab,
           tabs: const [
             Tab(icon: Icon(Icons.list), text: 'カード'),
             Tab(icon: Icon(Icons.map), text: 'マップ'),
@@ -146,6 +144,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
   Widget _customSlider() {
     return Expanded(
       child: Slider(
+        activeColor: AppColor.secondary,
         value: _currentRadius,
         min: 100,
         // 最小距離 (例: 100m)
