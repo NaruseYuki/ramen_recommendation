@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ramen_recommendation/models/ramen_state.dart';
 import 'package:ramen_recommendation/utils/color.dart';
 import 'package:ramen_recommendation/viewmodels/home_viewmodel.dart';
+import 'package:ramen_recommendation/views/screens/base/common/loading.dart';
 import 'package:ramen_recommendation/views/screens/base/error_listening_screen.dart';
 import 'package:ramen_recommendation/views/screens/search_results_screen.dart';
 
@@ -51,7 +52,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       backgroundColor: Colors.white,
       body: Center(
         child: homeState.isLoading
-            ? const CircularProgressIndicator()
+            ? LoadingWidget()
             : SingleChildScrollView(
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
