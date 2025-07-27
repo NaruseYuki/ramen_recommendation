@@ -24,9 +24,8 @@ class _SearchResultsScreenState extends ConsumerState<SearchResultsScreen>
   void initState() {
     super.initState(); // ErrorListeningPageのinitStateを呼び出す
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref
-          .read(searchResultsViewModelProvider.notifier)
-          .searchRamenPlaces(widget.ramenType);
+      final viewModel = ref.read(searchResultsViewModelProvider.notifier);
+      viewModel.searchRamenPlaces(widget.ramenType);
     });
   }
 

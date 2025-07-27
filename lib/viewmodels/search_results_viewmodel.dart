@@ -140,4 +140,14 @@ class SearchResultsViewModel extends _$SearchResultsViewModel {
       return false;
     }
   }
+
+  /// お気に入り店舗一覧をロード
+  Future<void> loadFavoriteShops() async {
+    final result = await _databaseService.getFavorites();
+    if (result is Success<List<RamenPlace>, AppErrorCode>) {
+      // 成功した場合
+      state = state.copyWith(
+          favoritePlaceIds: result.value.map((shop) => shop.id).toSet());
+    }
+  }
 }

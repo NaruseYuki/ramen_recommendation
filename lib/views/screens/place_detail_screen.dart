@@ -157,7 +157,7 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen>
       children: [
         Row(
           children: [
-            const Icon(Icons.star, color: Colors.amber),
+            const Icon(Icons.thumb_up_alt_rounded, color: Colors.orange),
             Text(
               '${details.rating} (${details.userRatingsTotal ?? 0}件の評価)',
               style: const TextStyle(fontWeight: FontWeight.bold),

@@ -20,6 +20,17 @@ class RamenListScreen extends ConsumerStatefulWidget {
 
 class _RamenListScreenState extends ConsumerState<RamenListScreen>
     with ErrorListeningMixin<RamenListScreen> {
+  late SearchResultsViewModel viewModel;
+
+  @override
+  void initState() {
+    super.initState(); // ErrorListeningPageのinitStateを呼び出す
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      viewModel = ref.read(searchResultsViewModelProvider.notifier);
+      viewModel.loadFavoriteShops();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     setupErrorListener(ref);
@@ -31,7 +42,7 @@ class _RamenListScreenState extends ConsumerState<RamenListScreen>
       return Center(child: Text('search_results.not_found'.tr()));
     }
     return customListView(state, (RamenPlace place) {
-      ref.read(searchResultsViewModelProvider.notifier).toggleFavorite(place);
+      viewModel.toggleFavorite(place);
     });
   }
 }
