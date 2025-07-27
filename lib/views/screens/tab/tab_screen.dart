@@ -4,6 +4,7 @@ import 'package:ramen_recommendation/views/screens/favorite_places_screen.dart';
 import 'package:ramen_recommendation/views/screens/home_screen.dart';
 
 import '../menu/menu.dart';
+import '../search_screen.dart';
 
 class TabScreen extends StatefulWidget {
   const TabScreen({super.key});
@@ -79,12 +80,7 @@ class _TabScreenState extends State<TabScreen>
           controller: _tabController,
           children: const [
             HomeScreen(),
-            Center(
-              child: Text(
-                'フリーワード検索機能は現在開発中です。\nお楽しみに！',
-                textAlign: TextAlign.center,
-              ),
-            ),
+            SearchScreen(),
             Center(
               child: Text(
                 '訪問記録機能は現在開発中です。\nお楽しみに！',

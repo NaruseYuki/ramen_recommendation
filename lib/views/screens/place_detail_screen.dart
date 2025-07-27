@@ -2,10 +2,12 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ramen_recommendation/api/responses/get_place_details_response.dart';
 import 'package:ramen_recommendation/models/ramen_place.dart';
 import 'package:ramen_recommendation/models/review.dart';
 import 'package:ramen_recommendation/utils/color.dart';
 import 'package:ramen_recommendation/viewmodels/place_detail_viewmodel.dart';
+import 'package:ramen_recommendation/views/screens/base/common/loading.dart';
 import 'package:ramen_recommendation/views/screens/base/error_listening_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -42,9 +44,7 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen>
     final state = ref.watch(placeDetailViewModelProvider);
 
     if (state.isLoading) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const Scaffold(body: LoadingWidget());
     }
 
     final detail = state.detail[widget.placeId]!;
@@ -71,34 +71,7 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen>
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      IconButton(
-                        icon: Icon(
-                          isFavorite ? Icons.star : Icons.star_border,
-                          color: isFavorite ? Colors.amber : null,
-                        ),
-                        onPressed: () async {
-                          final result = await placeDetailViewmodel
-                              .toggleFavorite(RamenPlace(
-                            id: detail.id,
-                            displayName: DisplayName(text: detail.name),
-                            address: detail.address,
-                            location: Location(
-                                latitude: detail.latitude,
-                                longitude: detail.longitude),
-                          ));
-                          if (result) {
-                            scaffoldMessenger.showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  isFavorite
-                                      ? 'favorite.remove_success'.tr()
-                                      : 'favorite.add_success'.tr(),
-                                ),
-                              ),
-                            );
-                          }
-                        },
-                      ),
+                      favoriteButton(isFavorite, detail, scaffoldMessenger),
                     ],
                   ),
                 ),
@@ -144,6 +117,37 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen>
         detail,
         ref,
       ),
+    );
+  }
+
+  IconButton favoriteButton(bool isFavorite, GetPlaceDetailsResponse detail,
+      ScaffoldMessengerState scaffoldMessenger) {
+    return IconButton(
+      icon: Icon(
+        isFavorite ? Icons.star : Icons.star_border,
+        color: isFavorite ? Colors.amber : null,
+      ),
+      onPressed: () async {
+        final result = await placeDetailViewmodel.toggleFavorite(RamenPlace(
+          id: detail.id,
+          displayName: DisplayName(text: detail.name),
+          address: detail.address,
+          location:
+              Location(latitude: detail.latitude, longitude: detail.longitude),
+        ));
+        if (result) {
+          scaffoldMessenger.showSnackBar(
+            SnackBar(
+              duration: const Duration(seconds: 1),
+              content: Text(
+                isFavorite
+                    ? 'favorite.remove_success'.tr()
+                    : 'favorite.add_success'.tr(),
+              ),
+            ),
+          );
+        }
+      },
     );
   }
 

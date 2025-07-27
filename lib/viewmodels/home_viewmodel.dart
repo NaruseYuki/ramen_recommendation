@@ -1,15 +1,15 @@
 // lib/viewmodels/home_viewmodel.dart
 import 'dart:developer';
 import 'dart:io';
-import 'package:ramen_recommendation/api/providers/service_providers.dart'; // errorMessageProviderをインポート
-import 'package:ramen_recommendation/services/tflite_service.dart';
-import 'package:ramen_recommendation/services/image_picker_service.dart';
-import 'package:ramen_recommendation/models/ramen_state.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
-import '../errors/app_error_code.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart'; // StateControllerをインポートするために必要
 
+import 'package:permission_handler/permission_handler.dart';
+import 'package:ramen_recommendation/api/providers/service_providers.dart'; // errorMessageProviderをインポート
+import 'package:ramen_recommendation/models/ramen_state.dart';
+import 'package:ramen_recommendation/services/image_picker_service.dart';
+import 'package:ramen_recommendation/services/tflite_service.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+import '../errors/app_error_code.dart';
 import '../repositories/result.dart';
 
 part 'home_viewmodel.g.dart';
@@ -18,13 +18,11 @@ part 'home_viewmodel.g.dart';
 class HomeViewModel extends _$HomeViewModel {
   late final TFLiteService _tfliteService;
   late final ImagePickerService _imagePickerService;
-  late final StateController<AppErrorCode?> _errorMessageController;
 
   @override
   RamenState build() {
     _tfliteService = ref.watch(tfliteServiceProvider);
     _imagePickerService = ref.watch(imagePickerServiceProvider);
-    _errorMessageController = ref.read(errorMessageProvider.notifier);
     return RamenState();
   }
 
@@ -33,7 +31,7 @@ class HomeViewModel extends _$HomeViewModel {
     final result = await _tfliteService.loadModel();
     if (result is Failure<void, AppErrorCode>) {
       log('Model loading failed: ${result.exception}');
-      _errorMessageController.state = result.exception; 
+      ref.read(errorMessageProvider.notifier).state = result.exception;
     }
   }
 
@@ -42,7 +40,8 @@ class HomeViewModel extends _$HomeViewModel {
     if (await requestGalleryPermission()) {
       await pickImageFromGallery();
     } else {
-      _errorMessageController.state = AppErrorCode.galleryPermissionDenied(); 
+      ref.read(errorMessageProvider.notifier).state =
+          AppErrorCode.galleryPermissionDenied();
     }
   }
 
@@ -51,7 +50,8 @@ class HomeViewModel extends _$HomeViewModel {
     if (await requestCameraPermission()) {
       await pickImageFromCamera();
     } else {
-      _errorMessageController.state = AppErrorCode.cameraPermissionDenied(); 
+      ref.read(errorMessageProvider.notifier).state =
+          AppErrorCode.cameraPermissionDenied();
     }
   }
 
@@ -64,9 +64,10 @@ class HomeViewModel extends _$HomeViewModel {
         await classifyImage(result.value);
       }
     } else if (result is Failure<File?, AppErrorCode>) {
-      _errorMessageController.state = result.exception; 
+      ref.read(errorMessageProvider.notifier).state = result.exception;
     } else {
-      _errorMessageController.state = AppErrorCode.commonSystemError(); 
+      ref.read(errorMessageProvider.notifier).state =
+          AppErrorCode.commonSystemError();
     }
   }
 
@@ -79,9 +80,10 @@ class HomeViewModel extends _$HomeViewModel {
         await classifyImage(result.value);
       }
     } else if (result is Failure<File?, AppErrorCode>) {
-      _errorMessageController.state = result.exception; 
+      ref.read(errorMessageProvider.notifier).state = result.exception;
     } else {
-      _errorMessageController.state = AppErrorCode.commonSystemError();
+      ref.read(errorMessageProvider.notifier).state =
+          AppErrorCode.commonSystemError();
     }
   }
 
@@ -89,7 +91,8 @@ class HomeViewModel extends _$HomeViewModel {
   Future<void> classifyImage(File? imageFile) async {
     state = state.copyWith(isLoading: true);
     if (imageFile == null) {
-      _errorMessageController.state = AppErrorCode.imageUnknownError();
+      ref.read(errorMessageProvider.notifier).state =
+          AppErrorCode.imageUnknownError();
       state = state.copyWith(isLoading: false);
       return;
     }
@@ -98,10 +101,11 @@ class HomeViewModel extends _$HomeViewModel {
     if (result is Success<String, AppErrorCode>) {
       state = state.copyWith(result: result.value, isLoading: false);
     } else if (result is Failure<String, AppErrorCode>) {
-      _errorMessageController.state = result.exception; 
+      ref.read(errorMessageProvider.notifier).state = result.exception;
       state = state.copyWith(isLoading: false);
     } else {
-      _errorMessageController.state = AppErrorCode.commonSystemError(); 
+      ref.read(errorMessageProvider.notifier).state =
+          AppErrorCode.commonSystemError();
       state = state.copyWith(isLoading: false);
     }
   }
