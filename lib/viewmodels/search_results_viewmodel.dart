@@ -10,8 +10,8 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../api/responses/search_ramen_places_response.dart';
 import '../errors/app_error_code.dart';
 import '../models/ramen_place.dart';
+import '../repositories/implements/database_repository.dart';
 import '../repositories/result.dart';
-import '../services/database_service.dart';
 
 part 'search_results_viewmodel.g.dart';
 

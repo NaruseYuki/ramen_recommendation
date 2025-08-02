@@ -7,11 +7,11 @@ import 'package:ramen_recommendation/views/screens/place_detail_screen.dart';
 Widget customListView(
     RamenState<dynamic> state, void Function(RamenPlace) onTap) {
   return GridView.builder(
-    padding: const EdgeInsets.all(8.0),
+    padding: const EdgeInsets.all(4.0),
     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
       crossAxisCount: 2,
       crossAxisSpacing: 8.0,
-      mainAxisSpacing: 8.0,
+      mainAxisSpacing: 4.0,
       childAspectRatio: 0.75,
     ),
     itemCount: state.places.length,

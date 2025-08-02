@@ -1,11 +1,11 @@
 // lib/viewmodels/favorite_places_viewmodel.dart
-import 'package:ramen_recommendation/errors/app_error_code.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:ramen_recommendation/models/ramen_state.dart';
-import 'package:ramen_recommendation/models/ramen_place.dart';
-import 'package:ramen_recommendation/services/database_service.dart';
-import 'package:ramen_recommendation/api/providers/service_providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ramen_recommendation/api/providers/service_providers.dart';
+import 'package:ramen_recommendation/errors/app_error_code.dart';
+import 'package:ramen_recommendation/models/ramen_place.dart';
+import 'package:ramen_recommendation/models/ramen_state.dart';
+import 'package:ramen_recommendation/repositories/implements/database_repository.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../repositories/result.dart';
 
@@ -14,12 +14,12 @@ part 'favorite_places_viewmodel.g.dart';
 @riverpod
 class FavoritePlacesViewModel extends _$FavoritePlacesViewModel {
   late final DatabaseService _databaseService;
-  late final StateController<AppErrorCode?> _errorMessageController; 
+  late final StateController<AppErrorCode?> _errorMessageController;
 
   @override
   RamenState build() {
     _databaseService = ref.watch(databaseServiceProvider);
-    _errorMessageController = ref.read(errorMessageProvider.notifier); 
+    _errorMessageController = ref.read(errorMessageProvider.notifier);
     return RamenState();
   }
 
@@ -39,13 +39,13 @@ class FavoritePlacesViewModel extends _$FavoritePlacesViewModel {
       state = state.copyWith(
         isLoading: false,
       );
-      _errorMessageController.state = result.exception; 
+      _errorMessageController.state = result.exception;
     } else {
       // 予期せぬ結果の場合
       state = state.copyWith(
         isLoading: false,
       );
-      _errorMessageController.state = AppErrorCode.commonSystemError(); 
+      _errorMessageController.state = AppErrorCode.commonSystemError();
     }
   }
 
@@ -76,16 +76,16 @@ class FavoritePlacesViewModel extends _$FavoritePlacesViewModel {
         return true;
       } else {
         // DB操作自体は成功したが、変更がなかった場合（例えば削除対象が見つからなかった場合など）
-        _errorMessageController.state = AppErrorCode.databaseUnknownError(); 
+        _errorMessageController.state = AppErrorCode.databaseUnknownError();
         return false;
       }
     } else if (dbResult is Failure<bool, AppErrorCode>) {
       // DB操作が失敗した場合
-      _errorMessageController.state = dbResult.exception; 
+      _errorMessageController.state = dbResult.exception;
       return false;
     } else {
       // 予期せぬ結果の場合
-      _errorMessageController.state = AppErrorCode.commonSystemError(); 
+      _errorMessageController.state = AppErrorCode.commonSystemError();
       return false;
     }
   }

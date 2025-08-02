@@ -117,7 +117,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
         children: [
           // 距離設定用のスライダー
           Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
             child: Row(
               children: [
                 _customSlider(),
