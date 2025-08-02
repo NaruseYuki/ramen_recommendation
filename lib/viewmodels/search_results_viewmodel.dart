@@ -30,7 +30,8 @@ class SearchResultsViewModel extends _$SearchResultsViewModel {
   }
 
   /// ラーメン店を検索
-  Future<bool> searchRamenPlaces(String keyword) async {
+  Future<bool> searchRamenPlaces(
+      {String keyword = 'ラーメン', double radius = 500}) async {
     state = state.copyWith(isLoading: true);
     Position? position;
     try {
@@ -50,10 +51,10 @@ class SearchResultsViewModel extends _$SearchResultsViewModel {
     }
     final result = await _placesRepository.searchRamenPlaces(
       request: SearchRamenPlacesRequest(
-        latitude: position.latitude,
-        longitude: position.longitude,
-        keyword: keyword,
-      ),
+          latitude: position.latitude,
+          longitude: position.longitude,
+          keyword: keyword,
+          radius: radius),
     );
 
     if (result is Success<SearchRamenPlacesResponse, AppErrorCode>) {

@@ -1,7 +1,7 @@
 // lib/repositories/implements/places_repository.dart
 import 'package:dio/dio.dart';
 import 'package:ramen_recommendation/api/requests/get_place_details_request.dart';
-import 'package:ramen_recommendation/api/responses/get_place_details_response.dart';
+import 'package:ramen_recommendation/api/responses/get_place_details_with_images_response.dart';
 import 'package:ramen_recommendation/api/responses/place_photo_response.dart';
 import 'package:ramen_recommendation/api/responses/search_ramen_places_response.dart';
 import 'package:ramen_recommendation/repositories/interfaces/places_repository_interface.dart';
@@ -81,21 +81,42 @@ class PlacesRepository implements PlacesRepositoryInterface {
     }
   }
 
-  /// ラーメン店の詳細情報を取得する
   @override
-  Future<Result<GetPlaceDetailsResponse, AppErrorCode>> getPlaceDetails({
+  Future<Result<GetPlaceDetailsWithImagesResponse, AppErrorCode>>
+      getPlaceDetails({
     required GetPlaceDetailsRequest request,
   }) async {
     try {
       final apiKey = await getAPIKey();
       final response = await apiClient.getPlaceDetails(
           request.placeId, request.toQueryParams(), apiKey, _contentType);
-      return Success(response);
+
+      final photos = response.photos;
+      final updatedPhotos = await Future.wait<PlacePhotoResponse?>(
+        (photos != null && photos.isNotEmpty)
+            ? photos.map((photo) async {
+                final photoResult = await getPlacePhotos(
+                  request: PlacePhotoRequest(
+                    maxHeightPx: 400,
+                    maxWidthPx: 400,
+                  ),
+                  photoName: photo.name,
+                );
+                if (photoResult is Success<PlacePhotoResponse, AppErrorCode>) {
+                  return photoResult.value;
+                } else {
+                  return null;
+                }
+              }).toList()
+            : [],
+      );
+      final updatedResponse = GetPlaceDetailsWithImagesResponse(
+          placeDetails: response, images: updatedPhotos);
+
+      return Success(updatedResponse);
     } on DioException catch (e) {
-      // ヘルパーメソッドを呼び出してエラーを処理
-      return _handleDioException<GetPlaceDetailsResponse>(e);
+      return _handleDioException<GetPlaceDetailsWithImagesResponse>(e);
     } on Exception catch (e) {
-      // その他の予期せぬエラー
       return Failure(AppErrorCode.commonSystemError());
     }
   }

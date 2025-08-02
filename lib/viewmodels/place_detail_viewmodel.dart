@@ -8,7 +8,7 @@ import 'package:ramen_recommendation/repositories/implements/database_repository
 import 'package:ramen_recommendation/repositories/interfaces/places_repository_interface.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../api/responses/get_place_details_response.dart';
+import '../api/responses/get_place_details_with_images_response.dart';
 import '../errors/app_error_code.dart';
 import '../repositories/result.dart';
 
@@ -77,12 +77,13 @@ class PlaceDetailViewModel extends _$PlaceDetailViewModel {
       request: GetPlaceDetailsRequest(placeId: placeId),
     );
 
-    if (result is Success<GetPlaceDetailsResponse, AppErrorCode>) {
+    if (result is Success<GetPlaceDetailsWithImagesResponse, AppErrorCode>) {
       state = state.copyWith(
         isLoading: false,
-        detail: {placeId: result.value},
+        detail: {placeId: result.value.placeDetails},
       );
-    } else if (result is Failure<GetPlaceDetailsResponse, AppErrorCode>) {
+    } else if (result
+        is Failure<GetPlaceDetailsWithImagesResponse, AppErrorCode>) {
       _errorMessageController.state = result.exception;
       state = state.copyWith(isLoading: false);
     } else {
@@ -96,11 +97,12 @@ class PlaceDetailViewModel extends _$PlaceDetailViewModel {
       request: GetPlaceDetailsRequest(placeId: placeId),
     );
 
-    if (result is Success<GetPlaceDetailsResponse, AppErrorCode>) {
+    if (result is Success<GetPlaceDetailsWithImagesResponse, AppErrorCode>) {
       state = state.copyWith(
-        detail: {placeId: result.value},
+        detail: {placeId: result.value.placeDetails},
       );
-    } else if (result is Failure<GetPlaceDetailsResponse, AppErrorCode>) {
+    } else if (result
+        is Failure<GetPlaceDetailsWithImagesResponse, AppErrorCode>) {
       _errorMessageController.state = result.exception;
     } else {
       _errorMessageController.state = AppErrorCode.commonSystemError();
