@@ -1,5 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
+import '../api/responses/place_photo_response.dart';
+
 part 'ramen_place.freezed.dart';
 part 'ramen_place.g.dart'; // JSONシリアライズ/デシリアライズ用に追加
 
@@ -11,6 +13,7 @@ abstract class RamenPlace with _$RamenPlace {
     @JsonKey(name: 'formattedAddress') required String address,
     @JsonKey(name: 'location') required Location location,
     @JsonKey(name: 'photos') List<Photo>? photos,
+    @JsonKey(name: 'image') PlacePhotoResponse? image,
   }) = _RamenPlace;
 
   factory RamenPlace.fromJson(Map<String, dynamic> json) =>

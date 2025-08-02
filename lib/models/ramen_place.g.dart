@@ -15,6 +15,9 @@ _RamenPlace _$RamenPlaceFromJson(Map<String, dynamic> json) => _RamenPlace(
       photos: (json['photos'] as List<dynamic>?)
           ?.map((e) => Photo.fromJson(e as Map<String, dynamic>))
           .toList(),
+      image: json['image'] == null
+          ? null
+          : PlacePhotoResponse.fromJson(json['image'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$RamenPlaceToJson(_RamenPlace instance) =>
@@ -24,6 +27,7 @@ Map<String, dynamic> _$RamenPlaceToJson(_RamenPlace instance) =>
       'formattedAddress': instance.address,
       'location': instance.location,
       'photos': instance.photos,
+      'image': instance.image,
     };
 
 _DisplayName _$DisplayNameFromJson(Map<String, dynamic> json) => _DisplayName(

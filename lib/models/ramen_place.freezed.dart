@@ -23,6 +23,8 @@ mixin _$RamenPlace {
   Location get location;
   @JsonKey(name: 'photos')
   List<Photo>? get photos;
+  @JsonKey(name: 'image')
+  PlacePhotoResponse? get image;
 
   /// Create a copy of RamenPlace
   /// with the given fields replaced by the non-null parameter values.
@@ -45,17 +47,18 @@ mixin _$RamenPlace {
             (identical(other.address, address) || other.address == address) &&
             (identical(other.location, location) ||
                 other.location == location) &&
-            const DeepCollectionEquality().equals(other.photos, photos));
+            const DeepCollectionEquality().equals(other.photos, photos) &&
+            (identical(other.image, image) || other.image == image));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, id, displayName, address,
-      location, const DeepCollectionEquality().hash(photos));
+      location, const DeepCollectionEquality().hash(photos), image);
 
   @override
   String toString() {
-    return 'RamenPlace(id: $id, displayName: $displayName, address: $address, location: $location, photos: $photos)';
+    return 'RamenPlace(id: $id, displayName: $displayName, address: $address, location: $location, photos: $photos, image: $image)';
   }
 }
 
@@ -70,10 +73,12 @@ abstract mixin class $RamenPlaceCopyWith<$Res> {
       @JsonKey(name: 'displayName') DisplayName displayName,
       @JsonKey(name: 'formattedAddress') String address,
       @JsonKey(name: 'location') Location location,
-      @JsonKey(name: 'photos') List<Photo>? photos});
+      @JsonKey(name: 'photos') List<Photo>? photos,
+      @JsonKey(name: 'image') PlacePhotoResponse? image});
 
   $DisplayNameCopyWith<$Res> get displayName;
   $LocationCopyWith<$Res> get location;
+  $PlacePhotoResponseCopyWith<$Res>? get image;
 }
 
 /// @nodoc
@@ -93,6 +98,7 @@ class _$RamenPlaceCopyWithImpl<$Res> implements $RamenPlaceCopyWith<$Res> {
     Object? address = null,
     Object? location = null,
     Object? photos = freezed,
+    Object? image = freezed,
   }) {
     return _then(_self.copyWith(
       id: null == id
@@ -115,6 +121,10 @@ class _$RamenPlaceCopyWithImpl<$Res> implements $RamenPlaceCopyWith<$Res> {
           ? _self.photos
           : photos // ignore: cast_nullable_to_non_nullable
               as List<Photo>?,
+      image: freezed == image
+          ? _self.image
+          : image // ignore: cast_nullable_to_non_nullable
+              as PlacePhotoResponse?,
     ));
   }
 
@@ -135,6 +145,20 @@ class _$RamenPlaceCopyWithImpl<$Res> implements $RamenPlaceCopyWith<$Res> {
   $LocationCopyWith<$Res> get location {
     return $LocationCopyWith<$Res>(_self.location, (value) {
       return _then(_self.copyWith(location: value));
+    });
+  }
+
+  /// Create a copy of RamenPlace
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $PlacePhotoResponseCopyWith<$Res>? get image {
+    if (_self.image == null) {
+      return null;
+    }
+
+    return $PlacePhotoResponseCopyWith<$Res>(_self.image!, (value) {
+      return _then(_self.copyWith(image: value));
     });
   }
 }
@@ -237,7 +261,8 @@ extension RamenPlacePatterns on RamenPlace {
             @JsonKey(name: 'displayName') DisplayName displayName,
             @JsonKey(name: 'formattedAddress') String address,
             @JsonKey(name: 'location') Location location,
-            @JsonKey(name: 'photos') List<Photo>? photos)?
+            @JsonKey(name: 'photos') List<Photo>? photos,
+            @JsonKey(name: 'image') PlacePhotoResponse? image)?
         $default, {
     required TResult orElse(),
   }) {
@@ -245,7 +270,7 @@ extension RamenPlacePatterns on RamenPlace {
     switch (_that) {
       case _RamenPlace() when $default != null:
         return $default(_that.id, _that.displayName, _that.address,
-            _that.location, _that.photos);
+            _that.location, _that.photos, _that.image);
       case _:
         return orElse();
     }
@@ -271,14 +296,15 @@ extension RamenPlacePatterns on RamenPlace {
             @JsonKey(name: 'displayName') DisplayName displayName,
             @JsonKey(name: 'formattedAddress') String address,
             @JsonKey(name: 'location') Location location,
-            @JsonKey(name: 'photos') List<Photo>? photos)
+            @JsonKey(name: 'photos') List<Photo>? photos,
+            @JsonKey(name: 'image') PlacePhotoResponse? image)
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _RamenPlace():
         return $default(_that.id, _that.displayName, _that.address,
-            _that.location, _that.photos);
+            _that.location, _that.photos, _that.image);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -303,14 +329,15 @@ extension RamenPlacePatterns on RamenPlace {
             @JsonKey(name: 'displayName') DisplayName displayName,
             @JsonKey(name: 'formattedAddress') String address,
             @JsonKey(name: 'location') Location location,
-            @JsonKey(name: 'photos') List<Photo>? photos)?
+            @JsonKey(name: 'photos') List<Photo>? photos,
+            @JsonKey(name: 'image') PlacePhotoResponse? image)?
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _RamenPlace() when $default != null:
         return $default(_that.id, _that.displayName, _that.address,
-            _that.location, _that.photos);
+            _that.location, _that.photos, _that.image);
       case _:
         return null;
     }
@@ -325,7 +352,8 @@ class _RamenPlace implements RamenPlace {
       @JsonKey(name: 'displayName') required this.displayName,
       @JsonKey(name: 'formattedAddress') required this.address,
       @JsonKey(name: 'location') required this.location,
-      @JsonKey(name: 'photos') final List<Photo>? photos})
+      @JsonKey(name: 'photos') final List<Photo>? photos,
+      @JsonKey(name: 'image') this.image})
       : _photos = photos;
   factory _RamenPlace.fromJson(Map<String, dynamic> json) =>
       _$RamenPlaceFromJson(json);
@@ -351,6 +379,10 @@ class _RamenPlace implements RamenPlace {
     // ignore: implicit_dynamic_type
     return EqualUnmodifiableListView(value);
   }
+
+  @override
+  @JsonKey(name: 'image')
+  final PlacePhotoResponse? image;
 
   /// Create a copy of RamenPlace
   /// with the given fields replaced by the non-null parameter values.
@@ -378,17 +410,18 @@ class _RamenPlace implements RamenPlace {
             (identical(other.address, address) || other.address == address) &&
             (identical(other.location, location) ||
                 other.location == location) &&
-            const DeepCollectionEquality().equals(other._photos, _photos));
+            const DeepCollectionEquality().equals(other._photos, _photos) &&
+            (identical(other.image, image) || other.image == image));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, id, displayName, address,
-      location, const DeepCollectionEquality().hash(_photos));
+      location, const DeepCollectionEquality().hash(_photos), image);
 
   @override
   String toString() {
-    return 'RamenPlace(id: $id, displayName: $displayName, address: $address, location: $location, photos: $photos)';
+    return 'RamenPlace(id: $id, displayName: $displayName, address: $address, location: $location, photos: $photos, image: $image)';
   }
 }
 
@@ -405,12 +438,15 @@ abstract mixin class _$RamenPlaceCopyWith<$Res>
       @JsonKey(name: 'displayName') DisplayName displayName,
       @JsonKey(name: 'formattedAddress') String address,
       @JsonKey(name: 'location') Location location,
-      @JsonKey(name: 'photos') List<Photo>? photos});
+      @JsonKey(name: 'photos') List<Photo>? photos,
+      @JsonKey(name: 'image') PlacePhotoResponse? image});
 
   @override
   $DisplayNameCopyWith<$Res> get displayName;
   @override
   $LocationCopyWith<$Res> get location;
+  @override
+  $PlacePhotoResponseCopyWith<$Res>? get image;
 }
 
 /// @nodoc
@@ -430,6 +466,7 @@ class __$RamenPlaceCopyWithImpl<$Res> implements _$RamenPlaceCopyWith<$Res> {
     Object? address = null,
     Object? location = null,
     Object? photos = freezed,
+    Object? image = freezed,
   }) {
     return _then(_RamenPlace(
       id: null == id
@@ -452,6 +489,10 @@ class __$RamenPlaceCopyWithImpl<$Res> implements _$RamenPlaceCopyWith<$Res> {
           ? _self._photos
           : photos // ignore: cast_nullable_to_non_nullable
               as List<Photo>?,
+      image: freezed == image
+          ? _self.image
+          : image // ignore: cast_nullable_to_non_nullable
+              as PlacePhotoResponse?,
     ));
   }
 
@@ -472,6 +513,20 @@ class __$RamenPlaceCopyWithImpl<$Res> implements _$RamenPlaceCopyWith<$Res> {
   $LocationCopyWith<$Res> get location {
     return $LocationCopyWith<$Res>(_self.location, (value) {
       return _then(_self.copyWith(location: value));
+    });
+  }
+
+  /// Create a copy of RamenPlace
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $PlacePhotoResponseCopyWith<$Res>? get image {
+    if (_self.image == null) {
+      return null;
+    }
+
+    return $PlacePhotoResponseCopyWith<$Res>(_self.image!, (value) {
+      return _then(_self.copyWith(image: value));
     });
   }
 }

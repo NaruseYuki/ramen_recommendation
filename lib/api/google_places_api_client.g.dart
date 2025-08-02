@@ -104,6 +104,45 @@ class _GooglePlacesApiClient implements GooglePlacesApiClient {
     return _value;
   }
 
+  @override
+  Future<PlacePhotoResponse> getPlacePhotos(
+    String name,
+    String apiKey,
+    PlacePhotoRequest queryParams,
+    String contentType,
+  ) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{r'key': apiKey};
+    queryParameters.addAll(queryParams.toJson());
+    final _headers = <String, dynamic>{r'Content-Type': contentType};
+    _headers.removeWhere((k, v) => v == null);
+    const Map<String, dynamic>? _data = null;
+    final _options = _setStreamType<PlacePhotoResponse>(
+      Options(
+        method: 'GET',
+        headers: _headers,
+        extra: _extra,
+        contentType: contentType,
+      )
+          .compose(
+            _dio.options,
+            '${name}/media',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late PlacePhotoResponse _value;
+    try {
+      _value = PlacePhotoResponse.fromJson(_result.data!);
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
+  }
+
   RequestOptions _setStreamType<T>(RequestOptions requestOptions) {
     if (T != dynamic &&
         !(requestOptions.responseType == ResponseType.bytes ||
