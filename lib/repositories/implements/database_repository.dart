@@ -1,8 +1,12 @@
+import 'dart:convert';
+
+import 'package:path/path.dart';
 import 'package:ramen_recommendation/errors/app_error_code.dart';
 import 'package:ramen_recommendation/models/ramen_place.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:path/path.dart';
-import '../repositories/result.dart';
+
+import '../../api/responses/place_photo_response.dart';
+import '../result.dart';
 
 class DatabaseService {
   static final DatabaseService _instance = DatabaseService._internal();
@@ -32,7 +36,8 @@ class DatabaseService {
             display_name TEXT,
             address TEXT,
             latitude REAL,
-            longitude REAL
+            longitude REAL,
+            image TEXT
           )
         ''');
       },
@@ -50,6 +55,9 @@ class DatabaseService {
           'address': place.address,
           'latitude': place.location.latitude,
           'longitude': place.location.longitude,
+          'image': place.image != null
+              ? jsonEncode(place.image?.toJson()) // ← ここがポイント
+              : null,
         },
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
@@ -63,7 +71,7 @@ class DatabaseService {
     try {
       final db = await database;
       final count =
-      await db.delete('favorites', where: 'id = ?', whereArgs: [id]);
+          await db.delete('favorites', where: 'id = ?', whereArgs: [id]);
       return Success(count > 0);
     } catch (e) {
       return Failure(AppErrorCode.databaseUnknownError());
@@ -78,13 +86,16 @@ class DatabaseService {
 
       return Success(List.generate(maps.length, (i) {
         return RamenPlace(
-            id: maps[i]['id'] as String,
-            displayName: DisplayName(text: maps[i]['display_name']),
-            address: maps[i]['address'],
-            location: Location(
-              latitude: maps[i]['latitude'] as double,
-              longitude: maps[i]['longitude'] as double,
-            )
+          id: maps[i]['id'] as String,
+          displayName: DisplayName(text: maps[i]['display_name']),
+          address: maps[i]['address'],
+          location: Location(
+            latitude: maps[i]['latitude'] as double,
+            longitude: maps[i]['longitude'] as double,
+          ),
+          image: maps[i]['image'] != null
+              ? PlacePhotoResponse.fromJson(jsonDecode(maps[i]['image']))
+              : null,
         );
       }));
     } catch (e) {

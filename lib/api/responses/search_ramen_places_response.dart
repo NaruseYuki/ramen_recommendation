@@ -1,15 +1,15 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:ramen_recommendation/models/ramen_place.dart';
 
-class SearchRamenPlacesResponse {
-  final List<RamenPlace> places;
+part 'search_ramen_places_response.freezed.dart';
+part 'search_ramen_places_response.g.dart';
 
-  SearchRamenPlacesResponse({required this.places});
+@freezed
+abstract class SearchRamenPlacesResponse with _$SearchRamenPlacesResponse {
+  const factory SearchRamenPlacesResponse({
+    required List<RamenPlace> places,
+  }) = _SearchRamenPlacesResponse;
 
-  /// JSON から `SearchRamenPlacesResponse` を生成
-  factory SearchRamenPlacesResponse.fromJson(Map<String, dynamic> json) {
-    final placesJson = json['places'] as List<dynamic>? ?? [];
-    final places =
-        placesJson.map((place) => RamenPlace.fromJson(place)).toList();
-    return SearchRamenPlacesResponse(places: places);
-  }
+  factory SearchRamenPlacesResponse.fromJson(Map<String, dynamic> json) =>
+      _$SearchRamenPlacesResponseFromJson(json);
 }

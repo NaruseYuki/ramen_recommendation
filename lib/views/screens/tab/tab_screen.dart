@@ -4,6 +4,7 @@ import 'package:ramen_recommendation/views/screens/favorite_places_screen.dart';
 import 'package:ramen_recommendation/views/screens/home_screen.dart';
 
 import '../menu/menu.dart';
+import '../search_screen.dart';
 
 class TabScreen extends StatefulWidget {
   const TabScreen({super.key});
@@ -44,7 +45,7 @@ class _TabScreenState extends State<TabScreen>
         height: 24,
         child: ColorFiltered(
           colorFilter: ColorFilter.mode(
-            isSelected ? Colors.white : Colors.grey,
+            isSelected ? Colors.white : Colors.white70,
             BlendMode.srcIn,
           ),
           child: Image.asset(assetPath, fit: BoxFit.contain),
@@ -79,12 +80,7 @@ class _TabScreenState extends State<TabScreen>
           controller: _tabController,
           children: const [
             HomeScreen(),
-            Center(
-              child: Text(
-                'フリーワード検索機能は現在開発中です。\nお楽しみに！',
-                textAlign: TextAlign.center,
-              ),
-            ),
+            SearchScreen(),
             Center(
               child: Text(
                 '訪問記録機能は現在開発中です。\nお楽しみに！',
@@ -101,7 +97,7 @@ class _TabScreenState extends State<TabScreen>
             labelPadding: const EdgeInsets.symmetric(horizontal: 4.0),
             indicatorColor: AppColor.secondary,
             labelColor: Colors.white,
-            unselectedLabelColor: Colors.grey,
+            unselectedLabelColor: Colors.white70,
             indicatorSize: TabBarIndicatorSize.tab,
             indicatorAnimation: TabIndicatorAnimation.elastic,
             tabs: [

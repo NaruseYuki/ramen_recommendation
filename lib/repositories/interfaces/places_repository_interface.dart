@@ -1,8 +1,10 @@
-import 'package:ramen_recommendation/api/responses/get_place_details_response.dart';
 import 'package:ramen_recommendation/api/responses/search_ramen_places_response.dart';
 
 import '../../api/requests/get_place_details_request.dart';
+import '../../api/requests/place_photo_request.dart';
 import '../../api/requests/search_ramen_places_request.dart';
+import '../../api/responses/get_place_details_with_images_response.dart';
+import '../../api/responses/place_photo_response.dart';
 import '../../errors/app_error_code.dart';
 import '../result.dart';
 
@@ -11,7 +13,13 @@ abstract class PlacesRepositoryInterface {
     required SearchRamenPlacesRequest request,
   });
 
-  Future<Result<GetPlaceDetailsResponse, AppErrorCode>> getPlaceDetails({
+  Future<Result<GetPlaceDetailsWithImagesResponse, AppErrorCode>>
+      getPlaceDetails({
     required GetPlaceDetailsRequest request,
+  });
+
+  Future<Result<PlacePhotoResponse, AppErrorCode>> getPlacePhotos({
+    required PlacePhotoRequest request,
+    required String photoName,
   });
 }
