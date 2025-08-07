@@ -301,10 +301,10 @@ packages:
     dependency: "direct main"
     description:
       name: easy_localization
-      sha256: "0f5239c7b8ab06c66440cfb0e9aa4b4640429c6668d5a42fe389c5de42220b12"
+      sha256: "2ccdf9db8fe4d9c5a75c122e6275674508fd0f0d49c827354967b8afcc56bbed"
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.7+1"
+    version: "3.0.8"
   easy_logger:
     dependency: transitive
     description:
@@ -1017,10 +1017,10 @@ packages:
     dependency: "direct main"
     description:
       name: retrofit
-      sha256: "84d70114a5b6bae5f4c1302335f9cb610ebeb1b02023d5e7e87697aaff52926a"
+      sha256: aa128e12ea56056bd4ebd1058e8421464595e4dc335b58ea346df86a31be9a02
       url: "https://pub.dev"
     source: hosted
-    version: "4.6.0"
+    version: "4.7.0"
   retrofit_generator:
     dependency: "direct main"
     description:
@@ -1214,10 +1214,10 @@ packages:
     dependency: transitive
     description:
       name: sqflite_common
-      sha256: "84731e8bfd8303a3389903e01fb2141b6e59b5973cacbb0929021df08dddbe8b"
+      sha256: "6ef422a4525ecc601db6c0a2233ff448c731307906e92cabc9ba292afaae16a6"
       url: "https://pub.dev"
     source: hosted
-    version: "2.5.5"
+    version: "2.5.6"
   sqflite_darwin:
     dependency: transitive
     description:

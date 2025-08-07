@@ -21,7 +21,7 @@ class PlacesRepository implements PlacesRepositoryInterface {
 
   /// DioExceptionを処理し、適切なResult<T, AppErrorCode>を返すヘルパーメソッド
   Result<T, AppErrorCode> _handleDioException<T>(DioException e) {
-    if (e.response?.data is Failure<dynamic, AppErrorCode>) {
+    if (e.response?.data is Failure<T, AppErrorCode>) {
       // CustomInterceptorがresolveしたFailureオブジェクトが検出された場合、それをそのまま返す
       return e.response?.data as Failure<T, AppErrorCode>;
     }

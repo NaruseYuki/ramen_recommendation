@@ -2,7 +2,7 @@ import 'package:flutter/services.dart';
 
 /// 環境変数から API キーを読み込む
 Future<String> getAPIKey() async {
-  const flavor = String.fromEnvironment('FLAVOR', defaultValue: 'dev');
+  const flavor = String.fromEnvironment('FLAVOR');
   final envFileName = '.env.$flavor';
 
   final envData = await rootBundle.loadString(envFileName);

@@ -2,7 +2,6 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ramen_recommendation/viewmodels/search_results_viewmodel.dart';
-
 import 'base/common/loading.dart';
 import 'base/error_listening_screen.dart';
 

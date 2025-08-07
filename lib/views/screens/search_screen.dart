@@ -57,7 +57,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
     final searchResultsViewModel =
         ref.read(searchResultsViewModelProvider.notifier);
     await searchResultsViewModel.searchRamenPlaces(
-        keyword: "$keyword ラーメン", radius: radius);
+        keyword: keyword, radius: radius);
     // radiusはSearchRamenPlacesRequestのデフォルト値が500.0なので、
     // ここでスライダーの値を使いたい場合はViewModelのsearchRamenPlacesメソッドを修正する必要があります。
     // 例: await searchResultsViewModel.searchRamenPlaces(keyword, radius: radius);

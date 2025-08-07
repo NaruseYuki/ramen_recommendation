@@ -1,5 +1,4 @@
 // lib/viewmodels/search_results_viewmodel.dart
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:ramen_recommendation/api/providers/service_providers.dart';
 import 'package:ramen_recommendation/api/requests/search_ramen_places_request.dart';
@@ -19,13 +18,11 @@ part 'search_results_viewmodel.g.dart';
 class SearchResultsViewModel extends _$SearchResultsViewModel {
   late final DatabaseService _databaseService;
   late final PlacesRepositoryInterface _placesRepository;
-  late final StateController<AppErrorCode?> _errorMessageController;
 
   @override
   RamenState build() {
     _placesRepository = ref.watch(placeDetailsRepositoryProvider);
     _databaseService = ref.watch(databaseServiceProvider);
-    _errorMessageController = ref.read(errorMessageProvider.notifier);
     return RamenState();
   }
 
@@ -45,7 +42,8 @@ class SearchResultsViewModel extends _$SearchResultsViewModel {
     }
 
     if (position == null) {
-      _errorMessageController.state = AppErrorCode.mapPermissionDenied();
+      ref.read(errorMessageProvider.notifier).state =
+          AppErrorCode.mapPermissionDenied();
       state = state.copyWith(isLoading: false);
       return false;
     }
@@ -61,11 +59,12 @@ class SearchResultsViewModel extends _$SearchResultsViewModel {
       state = state.copyWith(places: result.value.places, isLoading: false);
       return true;
     } else if (result is Failure<SearchRamenPlacesResponse, AppErrorCode>) {
-      _errorMessageController.state = result.exception;
+      ref.read(errorMessageProvider.notifier).state = result.exception;
       state = state.copyWith(isLoading: false);
       return false;
     } else {
-      _errorMessageController.state = AppErrorCode.commonSystemError();
+      ref.read(errorMessageProvider.notifier).state =
+          AppErrorCode.commonSystemError();
       state = state.copyWith(isLoading: false);
       return false;
     }
@@ -87,7 +86,7 @@ class SearchResultsViewModel extends _$SearchResultsViewModel {
     }
 
     if (permission == LocationPermission.deniedForever) {
-      _errorMessageController.state =
+      ref.read(errorMessageProvider.notifier).state =
           AppErrorCode.mapPermissionDenied(); // 永久拒否をエラーとして扱う
       state = state.copyWith(isLoading: false);
       return null; // エラーメッセージを設定し、nullを返す
@@ -128,16 +127,18 @@ class SearchResultsViewModel extends _$SearchResultsViewModel {
         return true;
       } else {
         // DB操作自体は成功したが、変更がなかった場合（例えば削除対象が見つからなかった場合など）
-        _errorMessageController.state = AppErrorCode.databaseUnknownError();
+        ref.read(errorMessageProvider.notifier).state =
+            AppErrorCode.databaseUnknownError();
         return false;
       }
     } else if (dbResult is Failure<bool, AppErrorCode>) {
       // DB操作が失敗した場合
-      _errorMessageController.state = dbResult.exception;
+      ref.read(errorMessageProvider.notifier).state = dbResult.exception;
       return false;
     } else {
       // 予期せぬ結果の場合
-      _errorMessageController.state = AppErrorCode.commonSystemError();
+      ref.read(errorMessageProvider.notifier).state =
+          AppErrorCode.commonSystemError();
       return false;
     }
   }
