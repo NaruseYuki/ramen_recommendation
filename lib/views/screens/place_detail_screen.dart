@@ -2,7 +2,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:ramen_recommendation/api/responses/get_place_details_response.dart';
+import 'package:ramen_recommendation/api/responses/get_place_details_with_images_response.dart';
 import 'package:ramen_recommendation/models/ramen_place.dart';
 import 'package:ramen_recommendation/models/review.dart';
 import 'package:ramen_recommendation/utils/color.dart';
@@ -48,7 +48,7 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen>
     }
 
     final detail = state.detail[widget.placeId]!;
-    final isFavorite = state.favoritePlaceIds.contains(detail.id);
+    final isFavorite = state.favoritePlaceIds.contains(detail.placeDetails.id);
 
     return Scaffold(
       backgroundColor: AppColor.background,
@@ -64,7 +64,7 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen>
                     children: [
                       Expanded(
                         child: Text(
-                          detail.name, // 店名を固定タイトルとして表示
+                          detail.placeDetails.name, // 店名を固定タイトルとして表示
                           style: const TextStyle(
                               fontSize: 24, fontWeight: FontWeight.bold),
                           maxLines: 2,
@@ -87,19 +87,20 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen>
                       children: [
                         const SizedBox(height: 8), // 固定部分との間にスペース
                         Text(
-                          detail.address,
+                          detail.placeDetails.address,
                           style: const TextStyle(fontSize: 16),
                         ),
                         const SizedBox(height: 16),
-                        if (detail.rating != null) _buildRating(detail),
+                        if (detail.placeDetails.rating != null)
+                          _buildRating(detail),
                         Text(
                           'place_detail.opening_hours'.tr(),
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
-                        if (detail.weekdayDescriptions.isNotEmpty)
+                        if (detail.placeDetails.weekdayDescriptions.isNotEmpty)
                           _buildOpeningHoursSection(detail),
                         const SizedBox(height: 16),
-                        if (detail.reviews.isNotEmpty)
+                        if (detail.placeDetails.reviews.isNotEmpty)
                           Text(
                             'place_detail.reviews'.tr(),
                             style: const TextStyle(fontWeight: FontWeight.bold),
@@ -120,7 +121,9 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen>
     );
   }
 
-  IconButton favoriteButton(bool isFavorite, GetPlaceDetailsResponse detail,
+  IconButton favoriteButton(
+      bool isFavorite,
+      GetPlaceDetailsWithImagesResponse detail,
       ScaffoldMessengerState scaffoldMessenger) {
     return IconButton(
       icon: Icon(
@@ -129,11 +132,12 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen>
       ),
       onPressed: () async {
         final result = await placeDetailViewmodel.toggleFavorite(RamenPlace(
-          id: detail.id,
-          displayName: DisplayName(text: detail.name),
-          address: detail.address,
-          location:
-              Location(latitude: detail.latitude, longitude: detail.longitude),
+          id: detail.placeDetails.id,
+          displayName: DisplayName(text: detail.placeDetails.name),
+          address: detail.placeDetails.address,
+          location: Location(
+              latitude: detail.placeDetails.latitude,
+              longitude: detail.placeDetails.longitude),
         ));
         if (result) {
           scaffoldMessenger.showSnackBar(
@@ -151,7 +155,7 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen>
     );
   }
 
-  Widget _buildRating(details) {
+  Widget _buildRating(GetPlaceDetailsWithImagesResponse details) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -159,7 +163,7 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen>
           children: [
             const Icon(Icons.thumb_up_alt_rounded, color: Colors.orange),
             Text(
-              '${details.rating} (${details.userRatingsTotal ?? 0}件の評価)',
+              '${details.placeDetails.rating} (${details.placeDetails.userRatingsTotal ?? 0}件の評価)',
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
           ],
@@ -169,7 +173,7 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen>
     );
   }
 
-  Widget _buildOpeningHoursSection(details) {
+  Widget _buildOpeningHoursSection(GetPlaceDetailsWithImagesResponse details) {
     return Container(
       decoration: BoxDecoration(
         border: Border.all(color: Colors.grey.shade300),
@@ -181,18 +185,23 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ...details.weekdayDescriptions.map((text) => Text(text)).toList(),
+          ...details.placeDetails.weekdayDescriptions
+              .map((text) => Text(text))
+              .toList(),
         ],
       ),
     );
   }
 
-  Widget _buildReviewsSection(details) {
+  Widget _buildReviewsSection(GetPlaceDetailsWithImagesResponse details) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        ...details.reviews.map((review) => _buildReviewTile(review)).toList(),
-        if (details.reviews.isEmpty) Text('place_detail.no_reviews'.tr()),
+        ...details.placeDetails.reviews
+            .map((review) => _buildReviewTile(review))
+            .toList(),
+        if (details.placeDetails.reviews.isEmpty)
+          Text('place_detail.no_reviews'.tr()),
         const SizedBox(height: 16),
       ],
     );
@@ -255,8 +264,8 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen>
     }
   }
 
-  Widget _buildActionButtons(
-      BuildContext context, dynamic details, WidgetRef ref) {
+  Widget _buildActionButtons(BuildContext context,
+      GetPlaceDetailsWithImagesResponse details, WidgetRef ref) {
     return Container(
       color: AppColor.background, // フッターの背景色を設定
       padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0), // 上下のパディングを調整
@@ -270,18 +279,19 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen>
               width: double.infinity, // 幅を親いっぱいに広げる
               child: ElevatedButton(
                 onPressed: () {
-                  _launchMap(details.name);
+                  _launchMap(details.placeDetails.name);
                 },
                 child: Text('place_detail.open_map'.tr()),
               ),
             ),
             // ウェブサイトURLがある場合のみ表示
-            if (details.website != null) ...[
+            if (details.placeDetails.website != null) ...[
               const SizedBox(height: 8), // ボタン間のスペース
               SizedBox(
                 width: double.infinity, // 幅を親いっぱいに広げる
                 child: ElevatedButton(
-                  onPressed: () => _launchWebsite(details.website!),
+                  onPressed: () =>
+                      _launchWebsite(details.placeDetails.website!),
                   child: Text('place_detail.website'.tr()),
                 ),
               ),

@@ -55,9 +55,8 @@ class DatabaseService {
           'address': place.address,
           'latitude': place.location.latitude,
           'longitude': place.location.longitude,
-          'image': place.image != null
-              ? jsonEncode(place.image?.toJson()) // ← ここがポイント
-              : null,
+          'image':
+              place.image != null ? jsonEncode(place.image?.toJson()) : null,
         },
         conflictAlgorithm: ConflictAlgorithm.replace,
       );

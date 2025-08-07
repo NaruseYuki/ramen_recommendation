@@ -80,7 +80,7 @@ class PlaceDetailViewModel extends _$PlaceDetailViewModel {
     if (result is Success<GetPlaceDetailsWithImagesResponse, AppErrorCode>) {
       state = state.copyWith(
         isLoading: false,
-        detail: {placeId: result.value.placeDetails},
+        detail: {placeId: result.value},
       );
     } else if (result
         is Failure<GetPlaceDetailsWithImagesResponse, AppErrorCode>) {
@@ -99,7 +99,7 @@ class PlaceDetailViewModel extends _$PlaceDetailViewModel {
 
     if (result is Success<GetPlaceDetailsWithImagesResponse, AppErrorCode>) {
       state = state.copyWith(
-        detail: {placeId: result.value.placeDetails},
+        detail: {placeId: result.value},
       );
     } else if (result
         is Failure<GetPlaceDetailsWithImagesResponse, AppErrorCode>) {
