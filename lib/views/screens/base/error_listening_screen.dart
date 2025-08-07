@@ -16,6 +16,8 @@ mixin ErrorListeningMixin<T extends ConsumerStatefulWidget>
       (prev, next) async {
         if (next != null && context.mounted) {
           await showError(context, next.toString());
+          // エラーをリセット
+          _hasSetupListener = false;
         }
       },
     );
@@ -25,7 +27,7 @@ mixin ErrorListeningMixin<T extends ConsumerStatefulWidget>
     await showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (_) => AlertDialog(
+      builder: (context) => AlertDialog(
         title: const Text('エラー'),
         content: Text(message),
         actions: [
