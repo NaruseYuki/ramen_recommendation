@@ -81,7 +81,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
               controller: _searchController,
               decoration: InputDecoration(
                 isDense: true,
-                hintStyle: TextStyle(
+                hintStyle: const TextStyle(
                   color: Colors.grey,
                 ),
                 hintText: 'ラーメン店を検索',
