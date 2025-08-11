@@ -1,13 +1,15 @@
+// lib/viewmodels/home_viewmodel.dart
 import 'dart:developer';
 import 'dart:io';
-import 'package:ramen_recommendation/api/providers/service_providers.dart';
-import 'package:ramen_recommendation/services/tflite_service.dart';
-import 'package:ramen_recommendation/services/image_picker_service.dart';
-import 'package:ramen_recommendation/models/ramen_state.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
-import '../errors/app_error_code.dart';
-import 'package:permission_handler/permission_handler.dart';
 
+import 'package:permission_handler/permission_handler.dart';
+import 'package:ramen_recommendation/api/providers/service_providers.dart'; // errorMessageProviderをインポート
+import 'package:ramen_recommendation/models/ramen_state.dart';
+import 'package:ramen_recommendation/services/image_picker_service.dart';
+import 'package:ramen_recommendation/services/tflite_service.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+import '../errors/app_error_code.dart';
 import '../repositories/result.dart';
 
 part 'home_viewmodel.g.dart';
@@ -23,12 +25,13 @@ class HomeViewModel extends _$HomeViewModel {
     _imagePickerService = ref.watch(imagePickerServiceProvider);
     return RamenState();
   }
+
   /// モデルのロード
   Future<void> loadModel() async {
-    final result = await _tfliteService.loadModel(); // Result型を受け取る
+    final result = await _tfliteService.loadModel();
     if (result is Failure<void, AppErrorCode>) {
       log('Model loading failed: ${result.exception}');
-      state = state.copyWith(error: result.exception);
+      ref.read(errorMessageProvider.notifier).state = result.exception;
     }
   }
 
@@ -37,7 +40,8 @@ class HomeViewModel extends _$HomeViewModel {
     if (await requestGalleryPermission()) {
       await pickImageFromGallery();
     } else {
-      state = state.copyWith(error: AppErrorCode.galleryPermissionDenied());
+      ref.read(errorMessageProvider.notifier).state =
+          AppErrorCode.galleryPermissionDenied();
     }
   }
 
@@ -46,37 +50,40 @@ class HomeViewModel extends _$HomeViewModel {
     if (await requestCameraPermission()) {
       await pickImageFromCamera();
     } else {
-      state = state.copyWith(error: AppErrorCode.cameraPermissionDenied());
+      ref.read(errorMessageProvider.notifier).state =
+          AppErrorCode.cameraPermissionDenied();
     }
   }
 
   /// ギャラリーから画像を選択
   Future<void> pickImageFromGallery() async {
-    final result = await _imagePickerService.pickImageFromGallery(); // Result型を受け取る
+    final result = await _imagePickerService.pickImageFromGallery();
     if (result is Success<File?, AppErrorCode>) {
       if (result.value != null) {
         state = state.copyWith(imageFile: result.value);
         await classifyImage(result.value);
       }
     } else if (result is Failure<File?, AppErrorCode>) {
-      state = state.copyWith(error: result.exception);
+      ref.read(errorMessageProvider.notifier).state = result.exception;
     } else {
-      state = state.copyWith(error: AppErrorCode.commonSystemError());
+      ref.read(errorMessageProvider.notifier).state =
+          AppErrorCode.commonSystemError();
     }
   }
 
   /// カメラで画像を撮影
   Future<void> pickImageFromCamera() async {
-    final result = await _imagePickerService.pickImageFromCamera(); // Result型を受け取る
+    final result = await _imagePickerService.pickImageFromCamera();
     if (result is Success<File?, AppErrorCode>) {
       if (result.value != null) {
         state = state.copyWith(imageFile: result.value);
         await classifyImage(result.value);
       }
     } else if (result is Failure<File?, AppErrorCode>) {
-      state = state.copyWith(error: result.exception);
+      ref.read(errorMessageProvider.notifier).state = result.exception;
     } else {
-      state = state.copyWith(error: AppErrorCode.commonSystemError());
+      ref.read(errorMessageProvider.notifier).state =
+          AppErrorCode.commonSystemError();
     }
   }
 
@@ -84,19 +91,25 @@ class HomeViewModel extends _$HomeViewModel {
   Future<void> classifyImage(File? imageFile) async {
     state = state.copyWith(isLoading: true);
     if (imageFile == null) {
-      state = state.copyWith(error: AppErrorCode.imageUnknownError(), isLoading: false);
+      ref.read(errorMessageProvider.notifier).state =
+          AppErrorCode.imageUnknownError();
+      state = state.copyWith(isLoading: false);
       return;
     }
-    final result = await _tfliteService.classifyImage(imageFile); // Result型を受け取る
+    final result = await _tfliteService.classifyImage(imageFile);
 
     if (result is Success<String, AppErrorCode>) {
       state = state.copyWith(result: result.value, isLoading: false);
     } else if (result is Failure<String, AppErrorCode>) {
-      state = state.copyWith(error: result.exception, isLoading: false);
+      ref.read(errorMessageProvider.notifier).state = result.exception;
+      state = state.copyWith(isLoading: false);
     } else {
-      state = state.copyWith(error: AppErrorCode.commonSystemError(), isLoading: false);
+      ref.read(errorMessageProvider.notifier).state =
+          AppErrorCode.commonSystemError();
+      state = state.copyWith(isLoading: false);
     }
   }
+
   /// カメラ権限リクエスト
   Future<bool> requestCameraPermission() async {
     final status = await Permission.camera.request();
